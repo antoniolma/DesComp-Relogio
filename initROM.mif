@@ -1,0 +1,42 @@
+-- Copyright (C) 2017  Intel Corporation. All rights reserved.
+-- Your use of Intel Corporation's design tools, logic functions
+-- and other software and tools, and its AMPP partner logic
+-- functions, and any output files from any of the foregoing
+-- (including device programming or simulation files), and any
+-- associated documentation or information are expressly subject
+-- to the terms and conditions of the Intel Program License
+-- Subscription Agreement, the Intel Quartus Prime License Agreement,
+-- the Intel FPGA IP License Agreement, or other applicable license
+-- agreement, including, without limitation, that your use is for
+-- the sole purpose of programming logic devices manufactured by
+-- Intel and sold by Intel or its authorized distributors.  Please
+-- refer to the applicable agreement for further details.
+
+WIDTH=8;
+DEPTH=256;
+ADDRESS_RADIX=DEC;
+DATA_RADIX=HEX;
+
+CONTENT BEGIN
+--endereco : dado;
+0 : 4 & '0' & 00;	-- LDI $0			
+1 : 5 & '1' & 20;	-- STA @288		
+2 : 5 & '1' & 21;	-- STA @289		
+3 : 5 & '1' & 22;	-- STA @290		
+4 : 5 & '1' & 23;	-- STA @291		
+5 : 5 & '1' & 24;	-- STA @292		
+6 : 5 & '1' & 25;	-- STA @293		
+7 : 5 & '1' & 00;	-- STA @256		
+8 : 5 & '1' & 01;	-- STA @257		
+9 : 5 & '1' & 02;	-- STA @258		
+10 : 5 & '0' & 00;	-- STA @0			
+11 : 5 & '0' & 01;	-- STA @1			
+12 : 5 & '0' & 02;	-- STA @2			
+13 : 5 & '1' & FF;	-- STA @511		
+14 : 5 & '1' & FE;	-- STA @510		
+15 : 4 & '0' & 01;	-- LDI $1
+16 : 5 & '1' & 60;	-- STA @352
+17 : 4 & '0' & 00;	-- LDI $0
+18 : 5 & '1' & 60;	-- STA @352
+19 : 6 & '0' & 0F;	-- JMP @15
+END;

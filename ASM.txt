@@ -1,0 +1,37 @@
+LDI $0		#Carrega o acumulador com o valor 0
+STA @10     #Limpa LIMITE (unidades)
+STA @11     #" LIMITE (dezenas)
+STA @12     #" LIMITE (centenas)
+STA @13     #" LIMITE (milhares)
+STA @14     #" LIMITE (dezenas de m.)
+STA @15     #" LIMITE (centenas de m.)
+STA @511	#" Leitura KEY0
+STA @510	#" Leitura KEY1
+LDI $0      # A repetição é para reaproveitar o código no FPGA_RESET
+STA @288	#Limpa HEX0
+STA @289	#" HEX1
+STA @290	#" HEX2
+STA @291	#" HEX3
+STA @292	#" HEX4
+STA @293	#" HEX5
+STA @256	#" LDR0 ~ LDR7
+STA @257	#" LDR8
+STA @258	#" LDR9
+STA @0		#" MEM[0] (unidades)
+STA @1		#" MEM[1] (dezenas)
+STA @2		#" MEM[2] (centenas)
+STA @3		#" MEM[3] (milhares)
+STA @4		#" MEM[4] (dezenas de m.)
+STA @5		#" MEM[5] (centenas de m.)
+LDA @352    #Le o estado do KEY0    - INICIO LOOP PRINCIPAL ------------------
+JMP @--     #....Desvia para aumentar os valores da contagem
+JMP @--     #....Escrever os valores das variáveis nos respectivos displays
+LDA @353    #Le o estado do KEY1 
+JMP @--     #....Desvia para AUMENTAR O LIMITE
+JMP @--     #....Verificar se o limite de contagem foi alcançado
+LDA @356    #Le o FPGA_RESET
+JMP @10     #....Desvia para RESETAR A CONTAGEM (reaproveitei o setup)
+JMP @26     #FIM DO LOOP PRINCIPAL -------------------------------------------
+LDA @320    #Le o valor dos SW's
+STA @--     #Salva no M[63] para referencia futura de LIMITE
+JMP @--     #Volta para veficiar o limite de contagem
