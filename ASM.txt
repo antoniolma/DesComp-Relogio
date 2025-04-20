@@ -5,6 +5,7 @@ STA @12     #" LIMITE (centenas)
 STA @13     #" LIMITE (milhares)
 STA @14     #" LIMITE (dezenas de m.)
 STA @15     #" LIMITE (centenas de m.)
+STA @16     #" LIMITE Contagem total
 STA @511	#" Leitura KEY0
 STA @510	#" Leitura KEY1
 LDI $0      # A repetição é para reaproveitar o código no FPGA_RESET            (B)
@@ -23,38 +24,18 @@ STA @2		#" MEM[2] (centenas)
 STA @3		#" MEM[3] (milhares)
 STA @4		#" MEM[4] (dezenas de m.)
 STA @5		#" MEM[5] (centenas de m.)
-LDA @352    #Le o estado do KEY0    - INICIO LOOP PRINCIPAL ------------------  (A)
+STA @6      #" Contagem total
+LDA @352    #Le o estado do KEY0    - INICIO LOOP PRINCIPAL ------------------  (A)<-
 JMP @--     #....Desvia para aumentar os valores da contagem
 JMP @--     #....Escrever os valores das variáveis nos respectivos displays
 LDI $1
 CEQ @353    #Le o estado do KEY1 
-JEQ @--     #....Desvia para AUMENTAR O LIMITE (se apertado)                    (C)
-JMP @--     #....Verificar se o limite de contagem foi alcançado                (E)
+JEQ @--     #....Desvia para AUMENTAR O LIMITE (se apertado)                    ->(C)
+JMP @--     #....Verificar se o limite de contagem foi alcançado                (D)<- chegada | ->(E) saida
 LDI $1
 CEQ @356    #Le o FPGA_RESET (Se tiver apertado desvia para sub-rotina)
-JEQ @--     #....Desvia para RESETAR A CONTAGEM (reaproveitei o setup)          (B)
-JMP @--     #FIM DO LOOP PRINCIPAL -------------------------------------------  (A)
-LDI $1      #AUMENTAR LIMITE - UNIDADES                                         (C)
-SOMA @10    #Adiciona 1
-LDI $11     #Carrega 11 para ver se extrapolou o limite
-CEQ @10     #Verifica se "unidades" ja esta no limite
-JEQ @--     #Se passou entao pula o JMP para voltar                             (D)
-JMP @--     #Se nao passou, volta                                               (E)
-LDI $1      #                                                                   (D)
-SUB @10     #Tira 1 das unidades, pra comparacao nao quebrar
-LDI $1      #AUMENTAR LIMITE - CENTENAS
-SOMA @11
-LDI $11     #Carrega 11 para ver se extrapolou o limite
-CEQ @11     #Verifica se "centenas" ja esta no limite
-JEQ @--     #Se passou entao pula o JMP para voltar                             (F)
-JMP @--     #Se nao passou, volta                                               (E)
-LDI $1      #                                                                   (F)
-SUB @11     #Tira 1 das centenas, pra comparacao nao quebrar
-LDI $1      #AUMENTAR LIMITE - MILHARES
-SOMA @12
-LDI $11     #Carrega 11 para ver se extrapolou o limite
-CEQ @12     #Verifica se "milhares" ja esta no limite
-JEQ @--     #Se passou entao pula o JMP para voltar                             (F)
-JMP @--     #Se nao passou, volta                                               (E)
-LDI $1      #                                                                   (F)
-SUB @12     #Tira 1 das milhares, pra comparacao nao quebrar
+JEQ @--     #....Desvia para RESETAR A CONTAGEM (reaproveitei o setup)          ->(B)
+JMP @--     #FIM DO LOOP PRINCIPAL -------------------------------------------  ->(A)
+LDA @320    #Le o estado dos SW's                                               (C)<-
+STA @16     #Salva no LIMITE Contagem Total
+JMP @--     #Volta para verificar se o ultrapassou o limite                     ->(D)
