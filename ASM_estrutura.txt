@@ -1,4 +1,4 @@
-LDI $0		#Carrega o acumulador com o valor 0
+LDI $0		#Carrega o acumulador com o valor 0                                 (B)<-
 STA @10     #Limpa LIMITE (unidades)
 STA @11     #" LIMITE (dezenas)
 STA @12     #" LIMITE (centenas)
@@ -6,10 +6,10 @@ STA @13     #" LIMITE (milhares)
 STA @14     #" LIMITE (dezenas de m.)
 STA @15     #" LIMITE (centenas de m.)
 STA @16     #" LIMITE Contagem total
+STA @17     #" Posicao para limite
 STA @511	#" Leitura KEY0
 STA @510	#" Leitura KEY1
-LDI $0      # A repetição é para reaproveitar o código no FPGA_RESET            (B)
-STA @288	#Limpa HEX0
+STA @288	#" HEX0
 STA @289	#" HEX1
 STA @290	#" HEX2
 STA @291	#" HEX3
@@ -25,17 +25,93 @@ STA @3		#" MEM[3] (milhares)
 STA @4		#" MEM[4] (dezenas de m.)
 STA @5		#" MEM[5] (centenas de m.)
 STA @6      #" Contagem total
-LDA @352    #Le o estado do KEY0    - INICIO LOOP PRINCIPAL ------------------  (A)<-
-JMP @--     #....Desvia para aumentar os valores da contagem
-JMP @--     #....Escrever os valores das variáveis nos respectivos displays
+STA @7      #" Posicao contagem
+LDI $1      #- INICIO LOOP PRINCIPAL -----------------------------------------  (A)<-
+CEQ @352    #Le o estado do KEY0
+JEQ @--     #....Desvia para aumentar os valores da contagem
+JSR @--     #....Escrever os valores das variáveis nos respectivos displays
 LDI $1
 CEQ @353    #Le o estado do KEY1 
-JEQ @--     #....Desvia para AUMENTAR O LIMITE (se apertado)                    ->(C)
-JMP @--     #....Verificar se o limite de contagem foi alcançado                (D)<- chegada | ->(E) saida
+JEQ @--     #....Desvia para MODIFICAR LIMITE (se apertado)                     ->(C)
+JSR @--     #....Verificar se o limite de contagem foi alcançado                (D)<- chegada | ->(E) saida
 LDI $1
 CEQ @356    #Le o FPGA_RESET (Se tiver apertado desvia para sub-rotina)
 JEQ @--     #....Desvia para RESETAR A CONTAGEM (reaproveitei o setup)          ->(B)
 JMP @--     #FIM DO LOOP PRINCIPAL -------------------------------------------  ->(A)
-LDA @320    #Le o estado dos SW's                                               (C)<-
-STA @16     #Salva no LIMITE Contagem Total
-JMP @--     #Volta para verificar se o ultrapassou o limite                     ->(D)
+LDI $0      #   -> POSICAO 0 <-----------------------------------               (C)<-
+CGT @7      #Se POSICAO CONTAGEM > 0
+JGT @--     #Proximo                                                            ->(G1)
+LDA @320    #Carrega: SW0 ~ SW7
+STA @10     #LIMITE HEX0 = Valor SW0 ~ SW7
+LDI $1
+SOMA @7     #Proxima posicao
+STA @7      #Salva proxima posicao
+JMP @--     #Volta                                                              ->(D)
+LDI $1      #   -> POSICAO 1 <-----------------------------------               (G1)<-
+CGT @7      #Se POSICAO CONTAGEM > 1
+JGT @--     #Proximo                                                            ->(G2)
+LDA @320    #Carrega: SW0 ~ SW7
+STA @11     #LIMITE HEX1 = Valor SW0 ~ SW7
+LDI $1
+SOMA @7     #Proxima posicao
+STA @7      #Salva proxima posicao
+JMP @--     #Volta                                                              ->(D)
+LDI $2      #   -> POSICAO 2 <----------------------------------                (G2)<-
+CGT @7      #Se POSICAO CONTAGEM > 2
+JGT @--     #Proximo                                                            ->(G3)
+LDA @320    #Carrega: SW0 ~ SW7
+STA @12     #LIMITE HEX2 = Valor SW0 ~ SW7
+LDI $1
+SOMA @7     #Proxima posicao
+STA @7      #Salva proxima posicao
+JMP @--     #Volta                                                              ->(D)
+LDI $3      #   -> POSICAO 3 <----------------------------------                (G3)<-
+CGT @7      #Se POSICAO CONTAGEM > 3
+JGT @--     #Proximo                                                            ->(G4)
+LDA @320    #Carrega: SW0 ~ SW7
+STA @13     #LIMITE HEX3 = Valor SW0 ~ SW7
+LDI $1
+SOMA @7     #Proxima posicao
+STA @7      #Salva proxima posicao
+JMP @--     #Volta                                                              ->(D)
+LDI $4      #   -> POSICAO 4 <----------------------------------                (G4)<-
+CGT @7      #Se POSICAO CONTAGEM > 4
+JGT @--     #Proximo                                                            ->(G5)
+LDA @320    #Carrega: SW0 ~ SW7
+STA @14     #LIMITE HEX4 = Valor SW0 ~ SW7
+LDI $1
+SOMA @7     #Proxima posicao
+STA @7      #Salva proxima posicao
+JMP @--     #Volta                                                              ->(D)
+LDA @320    #   -> POSICAO 5 <----------------------------------                (G5)<-
+STA @15     #LIMITE HEX5 = Valor SW0 ~ SW7
+LDI $0
+STA @7      #Reseta a posicao
+JMP @--     #Volta                                                              ->(D)
+LDA @15     # => LIMITE POS. 5 <===============================                 (E)<-
+CEQ @5      #Se HEX5 no limite
+JEQ @--     #Verifica o Proximo                                                 ->(F1)
+RET
+LDA @14     # => LIMITE POS. 4 <===============================                 (F1)<-
+CEQ @4      #Se HEX4 no limite
+JEQ @--     #Verifica o Proximo                                                 ->(F2)
+RET
+LDA @13     # => LIMITE POS. 3 <===============================                 (F2)<-
+CEQ @3      #Se HEX3 no limite
+JEQ @--     #Verifica o Proximo                                                 ->(F3)
+RET
+LDA @12     # => LIMITE POS. 2 <===============================                 (F3)<-
+CEQ @2      #Se HEX2 no limite
+JEQ @--     #Verifica o Proximo                                                 ->(F4)
+RET
+LDA @11     # => LIMITE POS. 1 <===============================                 (F4)<-
+CEQ @1      #Se HEX1 no limite
+JEQ @--     #Verifica o Proximo                                                 ->(F5)
+RET
+LDA @10     # => LIMITE POS. 0 <===============================                 (F5)<-
+CGT @0      #Se HEX0 PASSOU e outros no limite
+JGT @--     #Pula para correcao de valor                                        ->(F6)
+RET
+LDA @10     #CORRIGE VALOR DE HEX0                                              (F6)<-
+STA @0      #HEX0 volta para o limite
+RET

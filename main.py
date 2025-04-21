@@ -93,6 +93,9 @@ mne =	{
        "CEQ":   "8",
        "JSR":   "9",
        "RET":   "A",
+       "ADDi":  "B",
+       "CGT":   "C",
+       "JGT":   "D"
 }
 
 #Converte o valor após o caractere arroba '@'
