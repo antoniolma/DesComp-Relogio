@@ -126,96 +126,97 @@ tmp(124) := x"5" & '1' & x"00";	-- STA @256
 tmp(125) := x"5" & '1' & x"01";	-- STA @257	 
 tmp(126) := x"5" & '1' & x"02";	-- STA @258	
 tmp(127) := x"A" & '0' & x"00";	-- RET 
-tmp(128) := x"8" & '1' & x"61";	-- CEQ @353    	#Le o estado do KEY1 
-tmp(129) := x"7" & '0' & x"84";	-- JEQ @132    	#....Desvia para MODIFICAR LIMITE (se apertado)                     ->(C)
-tmp(130) := x"9" & '0' & x"C2";	-- JSR @194    	#....Verificar se o limite de contagem foi alcançado                (D)<- chegada | ->(E) saida
-tmp(131) := x"6" & '0' & x"23";	-- JMP @35     	# Endereço de inicio do LOOP
-tmp(132) := x"4" & '0' & x"00";	-- LDI $0      	#   -> POSICAO 0 <-----------------------------------               (C)<-
-tmp(133) := x"C" & '0' & x"07";	-- CGT @7      	#Se POSICAO CONTAGEM > 0
-tmp(134) := x"D" & '0' & x"8F";	-- JGT @143    	#Proximo                                                            ->(G1)
-tmp(135) := x"1" & '1' & x"40";	-- LDA @320    	#Carrega: SW0 ~ SW7
-tmp(136) := x"5" & '0' & x"0A";	-- STA @10     	#LIMITE HEX0 = Valor SW0 ~ SW7
-tmp(137) := x"4" & '0' & x"01";	-- LDI $1
-tmp(138) := x"5" & '1' & x"00";	-- STA @256    	#Liga os leds das posicoes configuradas
-tmp(139) := x"4" & '0' & x"01";	-- LDI $1
-tmp(140) := x"2" & '0' & x"07";	-- SOMA @7     	#Proxima posicao
-tmp(141) := x"5" & '0' & x"07";	-- STA @7      	#Salva proxima posicao
-tmp(142) := x"6" & '0' & x"82";	-- JMP @130    	#Volta                                                              ->(D)
-tmp(143) := x"4" & '0' & x"01";	-- LDI $1      	#   -> POSICAO 1 <-----------------------------------               (G1)<-
-tmp(144) := x"C" & '0' & x"07";	-- CGT @7      	#Se POSICAO CONTAGEM > 1
-tmp(145) := x"D" & '0' & x"9A";	-- JGT @154    	#Proximo                                                            ->(G2)
-tmp(146) := x"1" & '1' & x"40";	-- LDA @320    	#Carrega: SW0 ~ SW7
-tmp(147) := x"5" & '0' & x"0B";	-- STA @11     	#LIMITE HEX1 = Valor SW0 ~ SW7
-tmp(148) := x"4" & '0' & x"03";	-- LDI $3
-tmp(149) := x"5" & '1' & x"00";	-- STA @256    	#Liga os leds das posicoes configuradas
-tmp(150) := x"4" & '0' & x"01";	-- LDI $1
-tmp(151) := x"2" & '0' & x"07";	-- SOMA @7     	#Proxima posicao
-tmp(152) := x"5" & '0' & x"07";	-- STA @7      	#Salva proxima posicao
-tmp(153) := x"6" & '0' & x"82";	-- JMP @130    	#Volta                                                              ->(D)
-tmp(154) := x"4" & '0' & x"02";	-- LDI $2      	#   -> POSICAO 2 <----------------------------------                (G2)<-
-tmp(155) := x"C" & '0' & x"07";	-- CGT @7      	#Se POSICAO CONTAGEM > 2
-tmp(156) := x"D" & '0' & x"A5";	-- JGT @165    	#Proximo                                                            ->(G3)
-tmp(157) := x"1" & '1' & x"40";	-- LDA @320    	#Carrega: SW0 ~ SW7
-tmp(158) := x"5" & '0' & x"0C";	-- STA @12     	#LIMITE HEX2 = Valor SW0 ~ SW7
-tmp(159) := x"4" & '0' & x"07";	-- LDI $7
-tmp(160) := x"5" & '1' & x"00";	-- STA @256    	#Liga os leds das posicoes configuradas
-tmp(161) := x"4" & '0' & x"01";	-- LDI $1
-tmp(162) := x"2" & '0' & x"07";	-- SOMA @7     	#Proxima posicao
-tmp(163) := x"5" & '0' & x"07";	-- STA @7      	#Salva proxima posicao
-tmp(164) := x"6" & '0' & x"82";	-- JMP @130    	#Volta                                                              ->(D)
-tmp(165) := x"4" & '0' & x"03";	-- LDI $3      	#   -> POSICAO 3 <----------------------------------                (G3)<-
-tmp(166) := x"C" & '0' & x"07";	-- CGT @7      	#Se POSICAO CONTAGEM > 3
-tmp(167) := x"D" & '0' & x"B0";	-- JGT @176    	#Proximo                                                            ->(G4)
-tmp(168) := x"1" & '1' & x"40";	-- LDA @320    	#Carrega: SW0 ~ SW7
-tmp(169) := x"5" & '0' & x"0D";	-- STA @13     	#LIMITE HEX3 = Valor SW0 ~ SW7
-tmp(170) := x"4" & '0' & x"0F";	-- LDI $15
-tmp(171) := x"5" & '1' & x"00";	-- STA @256    	#Liga os leds das posicoes configuradas
-tmp(172) := x"4" & '0' & x"01";	-- LDI $1
-tmp(173) := x"2" & '0' & x"07";	-- SOMA @7     	#Proxima posicao
-tmp(174) := x"5" & '0' & x"07";	-- STA @7      	#Salva proxima posicao
-tmp(175) := x"6" & '0' & x"82";	-- JMP @130    	#Volta                                                              ->(D)
-tmp(176) := x"4" & '0' & x"04";	-- LDI $4      	#   -> POSICAO 4 <----------------------------------                (G4)<-
-tmp(177) := x"C" & '0' & x"07";	-- CGT @7      	#Se POSICAO CONTAGEM > 4
-tmp(178) := x"D" & '0' & x"BB";	-- JGT @187    	#Proximo                                                            ->(G5)
-tmp(179) := x"1" & '1' & x"40";	-- LDA @320    	#Carrega: SW0 ~ SW7
-tmp(180) := x"5" & '0' & x"0E";	-- STA @14     	#LIMITE HEX4 = Valor SW0 ~ SW7
-tmp(181) := x"4" & '0' & x"1F";	-- LDI $31
-tmp(182) := x"5" & '1' & x"00";	-- STA @256    	#Liga os leds das posicoes configuradas
-tmp(183) := x"4" & '0' & x"01";	-- LDI $1
-tmp(184) := x"2" & '0' & x"07";	-- SOMA @7     	#Proxima posicao
-tmp(185) := x"5" & '0' & x"07";	-- STA @7      	#Salva proxima posicao
-tmp(186) := x"6" & '0' & x"82";	-- JMP @130    	#Volta                                                              ->(D)
-tmp(187) := x"1" & '1' & x"40";	-- LDA @320    	#   -> POSICAO 5 <----------------------------------                (G5)<-
-tmp(188) := x"5" & '0' & x"0F";	-- STA @15     	#LIMITE HEX5 = Valor SW0 ~ SW7
-tmp(189) := x"4" & '0' & x"3F";	-- LDI $63
-tmp(190) := x"5" & '1' & x"00";	-- STA @256    	#Liga os leds das posicoes configuradas
-tmp(191) := x"4" & '0' & x"00";	-- LDI $0
-tmp(192) := x"5" & '0' & x"07";	-- STA @7      	#Reseta a posicao
-tmp(193) := x"6" & '0' & x"82";	-- JMP @130    	#Volta                                                              ->(D)
-tmp(194) := x"1" & '0' & x"0F";	-- LDA @15     	# => LIMITE POS. 5 <===============================                 (E)<-
-tmp(195) := x"8" & '0' & x"05";	-- CEQ @5      	#Se HEX5 no limite
-tmp(196) := x"7" & '0' & x"C6";	-- JEQ @198    	#Verifica o Proximo                                                 ->(F1)
-tmp(197) := x"A" & '0' & x"00";	-- RET
-tmp(198) := x"1" & '0' & x"0E";	-- LDA @14     	# => LIMITE POS. 4 <===============================                 (F1)<-
-tmp(199) := x"8" & '0' & x"04";	-- CEQ @4      	#Se HEX4 no limite
-tmp(200) := x"7" & '0' & x"CA";	-- JEQ @202     	#Verifica o Proximo                                                 ->(F2)
-tmp(201) := x"A" & '0' & x"00";	-- RET
-tmp(202) := x"1" & '0' & x"0D";	-- LDA @13     	# => LIMITE POS. 3 <===============================                 (F2)<-
-tmp(203) := x"8" & '0' & x"03";	-- CEQ @3      	#Se HEX3 no limite
-tmp(204) := x"7" & '0' & x"CE";	-- JEQ @206    	#Verifica o Proximo                                                 ->(F3)
-tmp(205) := x"A" & '0' & x"00";	-- RET
-tmp(206) := x"1" & '0' & x"0C";	-- LDA @12     	# => LIMITE POS. 2 <===============================                 (F3)<-
-tmp(207) := x"8" & '0' & x"02";	-- CEQ @2      	#Se HEX2 no limite
-tmp(208) := x"7" & '0' & x"D2";	-- JEQ @210     	#Verifica o Proximo                                                 ->(F4)
-tmp(209) := x"A" & '0' & x"00";	-- RET
-tmp(210) := x"1" & '0' & x"0B";	-- LDA @11     	# => LIMITE POS. 1 <===============================                 (F4)<-
-tmp(211) := x"8" & '0' & x"01";	-- CEQ @1      	#Se HEX1 no limite
-tmp(212) := x"7" & '0' & x"D6";	-- JEQ @214    	#Verifica o Proximo                                                 ->(F5)
-tmp(213) := x"A" & '0' & x"00";	-- RET
-tmp(214) := x"1" & '0' & x"0A";	-- LDA @10     	# => LIMITE POS. 0 <===============================                 (F5)<-
-tmp(215) := x"C" & '0' & x"00";	-- CGT @0      	#Se HEX0 PASSOU e outros no limite
-tmp(216) := x"D" & '0' & x"DA";	-- JGT @218    	#Pula para correcao de valor                                        ->(F6)
-tmp(217) := x"A" & '0' & x"00";	-- RET
-tmp(218) := x"1" & '0' & x"0A";	-- LDA @10     	#CORRIGE VALOR DE HEX0                                              (F6)<-
-tmp(219) := x"5" & '0' & x"00";	-- STA @0      	#HEX0 volta para o limite
-tmp(220) := x"A" & '0' & x"00";	-- RET
+tmp(128) := x"4" & '0' & x"01";	-- LDI $1
+tmp(129) := x"8" & '1' & x"61";	-- CEQ @353    	#Le o estado do KEY1 
+tmp(130) := x"7" & '0' & x"85";	-- JEQ @133    	#....Desvia para MODIFICAR LIMITE (se apertado)                     ->(C)
+tmp(131) := x"9" & '0' & x"C3";	-- JSR @195    	#....Verificar se o limite de contagem foi alcançado                (D)<- chegada | ->(E) saida
+tmp(132) := x"6" & '0' & x"23";	-- JMP @35     	# Endereço de inicio do LOOP
+tmp(133) := x"4" & '0' & x"00";	-- LDI $0      	#   -> POSICAO 0 <-----------------------------------               (C)<-
+tmp(134) := x"C" & '0' & x"07";	-- CGT @7      	#Se POSICAO CONTAGEM > 0
+tmp(135) := x"D" & '0' & x"90";	-- JGT @144    	#Proximo                                                            ->(G1)
+tmp(136) := x"1" & '1' & x"40";	-- LDA @320    	#Carrega: SW0 ~ SW7
+tmp(137) := x"5" & '0' & x"0A";	-- STA @10     	#LIMITE HEX0 = Valor SW0 ~ SW7
+tmp(138) := x"4" & '0' & x"01";	-- LDI $1
+tmp(139) := x"5" & '1' & x"00";	-- STA @256    	#Liga os leds das posicoes configuradas
+tmp(140) := x"4" & '0' & x"01";	-- LDI $1
+tmp(141) := x"2" & '0' & x"07";	-- SOMA @7     	#Proxima posicao
+tmp(142) := x"5" & '0' & x"07";	-- STA @7      	#Salva proxima posicao
+tmp(143) := x"6" & '0' & x"83";	-- JMP @131    	#Volta                                                              ->(D)
+tmp(144) := x"4" & '0' & x"01";	-- LDI $1      	#   -> POSICAO 1 <-----------------------------------               (G1)<-
+tmp(145) := x"C" & '0' & x"07";	-- CGT @7      	#Se POSICAO CONTAGEM > 1
+tmp(146) := x"D" & '0' & x"9B";	-- JGT @155    	#Proximo                                                            ->(G2)
+tmp(147) := x"1" & '1' & x"40";	-- LDA @320    	#Carrega: SW0 ~ SW7
+tmp(148) := x"5" & '0' & x"0B";	-- STA @11     	#LIMITE HEX1 = Valor SW0 ~ SW7
+tmp(149) := x"4" & '0' & x"03";	-- LDI $3
+tmp(150) := x"5" & '1' & x"00";	-- STA @256    	#Liga os leds das posicoes configuradas
+tmp(151) := x"4" & '0' & x"01";	-- LDI $1
+tmp(152) := x"2" & '0' & x"07";	-- SOMA @7     	#Proxima posicao
+tmp(153) := x"5" & '0' & x"07";	-- STA @7      	#Salva proxima posicao
+tmp(154) := x"6" & '0' & x"83";	-- JMP @131    	#Volta                                                              ->(D)
+tmp(155) := x"4" & '0' & x"02";	-- LDI $2      	#   -> POSICAO 2 <----------------------------------                (G2)<-
+tmp(156) := x"C" & '0' & x"07";	-- CGT @7      	#Se POSICAO CONTAGEM > 2
+tmp(157) := x"D" & '0' & x"A6";	-- JGT @166    	#Proximo                                                            ->(G3)
+tmp(158) := x"1" & '1' & x"40";	-- LDA @320    	#Carrega: SW0 ~ SW7
+tmp(159) := x"5" & '0' & x"0C";	-- STA @12     	#LIMITE HEX2 = Valor SW0 ~ SW7
+tmp(160) := x"4" & '0' & x"07";	-- LDI $7
+tmp(161) := x"5" & '1' & x"00";	-- STA @256    	#Liga os leds das posicoes configuradas
+tmp(162) := x"4" & '0' & x"01";	-- LDI $1
+tmp(163) := x"2" & '0' & x"07";	-- SOMA @7     	#Proxima posicao
+tmp(164) := x"5" & '0' & x"07";	-- STA @7      	#Salva proxima posicao
+tmp(165) := x"6" & '0' & x"83";	-- JMP @131    	#Volta                                                              ->(D)
+tmp(166) := x"4" & '0' & x"03";	-- LDI $3      	#   -> POSICAO 3 <----------------------------------                (G3)<-
+tmp(167) := x"C" & '0' & x"07";	-- CGT @7      	#Se POSICAO CONTAGEM > 3
+tmp(168) := x"D" & '0' & x"B1";	-- JGT @177    	#Proximo                                                            ->(G4)
+tmp(169) := x"1" & '1' & x"40";	-- LDA @320    	#Carrega: SW0 ~ SW7
+tmp(170) := x"5" & '0' & x"0D";	-- STA @13     	#LIMITE HEX3 = Valor SW0 ~ SW7
+tmp(171) := x"4" & '0' & x"0F";	-- LDI $15
+tmp(172) := x"5" & '1' & x"00";	-- STA @256    	#Liga os leds das posicoes configuradas
+tmp(173) := x"4" & '0' & x"01";	-- LDI $1
+tmp(174) := x"2" & '0' & x"07";	-- SOMA @7     	#Proxima posicao
+tmp(175) := x"5" & '0' & x"07";	-- STA @7      	#Salva proxima posicao
+tmp(176) := x"6" & '0' & x"83";	-- JMP @131    	#Volta                                                              ->(D)
+tmp(177) := x"4" & '0' & x"04";	-- LDI $4      	#   -> POSICAO 4 <----------------------------------                (G4)<-
+tmp(178) := x"C" & '0' & x"07";	-- CGT @7      	#Se POSICAO CONTAGEM > 4
+tmp(179) := x"D" & '0' & x"BC";	-- JGT @188    	#Proximo                                                            ->(G5)
+tmp(180) := x"1" & '1' & x"40";	-- LDA @320    	#Carrega: SW0 ~ SW7
+tmp(181) := x"5" & '0' & x"0E";	-- STA @14     	#LIMITE HEX4 = Valor SW0 ~ SW7
+tmp(182) := x"4" & '0' & x"1F";	-- LDI $31
+tmp(183) := x"5" & '1' & x"00";	-- STA @256    	#Liga os leds das posicoes configuradas
+tmp(184) := x"4" & '0' & x"01";	-- LDI $1
+tmp(185) := x"2" & '0' & x"07";	-- SOMA @7     	#Proxima posicao
+tmp(186) := x"5" & '0' & x"07";	-- STA @7      	#Salva proxima posicao
+tmp(187) := x"6" & '0' & x"83";	-- JMP @131    	#Volta                                                              ->(D)
+tmp(188) := x"1" & '1' & x"40";	-- LDA @320    	#   -> POSICAO 5 <----------------------------------                (G5)<-
+tmp(189) := x"5" & '0' & x"0F";	-- STA @15     	#LIMITE HEX5 = Valor SW0 ~ SW7
+tmp(190) := x"4" & '0' & x"3F";	-- LDI $63
+tmp(191) := x"5" & '1' & x"00";	-- STA @256    	#Liga os leds das posicoes configuradas
+tmp(192) := x"4" & '0' & x"00";	-- LDI $0
+tmp(193) := x"5" & '0' & x"07";	-- STA @7      	#Reseta a posicao
+tmp(194) := x"6" & '0' & x"83";	-- JMP @131    	#Volta                                                              ->(D)
+tmp(195) := x"1" & '0' & x"0F";	-- LDA @15     	# => LIMITE POS. 5 <===============================                 (E)<-
+tmp(196) := x"8" & '0' & x"05";	-- CEQ @5      	#Se HEX5 no limite
+tmp(197) := x"7" & '0' & x"C7";	-- JEQ @199    	#Verifica o Proximo                                                 ->(F1)
+tmp(198) := x"A" & '0' & x"00";	-- RET
+tmp(199) := x"1" & '0' & x"0E";	-- LDA @14     	# => LIMITE POS. 4 <===============================                 (F1)<-
+tmp(200) := x"8" & '0' & x"04";	-- CEQ @4      	#Se HEX4 no limite
+tmp(201) := x"7" & '0' & x"CB";	-- JEQ @203     	#Verifica o Proximo                                                 ->(F2)
+tmp(202) := x"A" & '0' & x"00";	-- RET
+tmp(203) := x"1" & '0' & x"0D";	-- LDA @13     	# => LIMITE POS. 3 <===============================                 (F2)<-
+tmp(204) := x"8" & '0' & x"03";	-- CEQ @3      	#Se HEX3 no limite
+tmp(205) := x"7" & '0' & x"CF";	-- JEQ @207    	#Verifica o Proximo                                                 ->(F3)
+tmp(206) := x"A" & '0' & x"00";	-- RET
+tmp(207) := x"1" & '0' & x"0C";	-- LDA @12     	# => LIMITE POS. 2 <===============================                 (F3)<-
+tmp(208) := x"8" & '0' & x"02";	-- CEQ @2      	#Se HEX2 no limite
+tmp(209) := x"7" & '0' & x"D3";	-- JEQ @211     	#Verifica o Proximo                                                 ->(F4)
+tmp(210) := x"A" & '0' & x"00";	-- RET
+tmp(211) := x"1" & '0' & x"0B";	-- LDA @11     	# => LIMITE POS. 1 <===============================                 (F4)<-
+tmp(212) := x"8" & '0' & x"01";	-- CEQ @1      	#Se HEX1 no limite
+tmp(213) := x"7" & '0' & x"D7";	-- JEQ @215    	#Verifica o Proximo                                                 ->(F5)
+tmp(214) := x"A" & '0' & x"00";	-- RET
+tmp(215) := x"1" & '0' & x"0A";	-- LDA @10     	# => LIMITE POS. 0 <===============================                 (F5)<-
+tmp(216) := x"C" & '0' & x"00";	-- CGT @0      	#Se HEX0 PASSOU e outros no limite
+tmp(217) := x"D" & '0' & x"DB";	-- JGT @219    	#Pula para correcao de valor                                        ->(F6)
+tmp(218) := x"A" & '0' & x"00";	-- RET
+tmp(219) := x"1" & '0' & x"0A";	-- LDA @10     	#CORRIGE VALOR DE HEX0                                              (F6)<-
+tmp(220) := x"5" & '0' & x"00";	-- STA @0      	#HEX0 volta para o limite
+tmp(221) := x"A" & '0' & x"00";	-- RET
