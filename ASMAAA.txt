@@ -1,4 +1,4 @@
-LDI $0		#Carrega o acumulador com o valor 0
+LDI $0		#Carrega o acumulador com o valor 0                                 (B)<-
 STA @10     #Limpa LIMITE (unidades)
 STA @11     #" LIMITE (dezenas)
 STA @12     #" LIMITE (centenas)
@@ -7,6 +7,11 @@ STA @14     #" LIMITE (dezenas de m.)
 STA @15     #" LIMITE (centenas de m.)
 STA @16     #" LIMITE Contagem total
 STA @17     #" Posicao para limite
+LDI $10
+STA @18     # Constante 10
+LDI $1
+STA @19     # Constante 1
+LDI $0
 STA @511	#" Leitura KEY0
 STA @510	#" Leitura KEY1
 STA @288	#" HEX0
@@ -24,111 +29,33 @@ STA @2		#" MEM[2] (centenas)
 STA @3		#" MEM[3] (milhares)
 STA @4		#" MEM[4] (dezenas de m.)
 STA @5		#" MEM[5] (centenas de m.)
-STA @18     # Constante 0
-LDI $1
-STA @19     # Constante 1
-LDI $10
-STA @20     # Constante 10
-LDI $0      
-STA @21     # Flag e inibir contagem
 STA @6      #" Contagem total
 STA @7      #" Posicao contagem
-NOP         # INICIO LOOP PRINCIPAL ----------------------------------------- 
-LDA @352
-CEQ @18     
-JEQ @41     # Se não foi pressionado, permanece no loop *************                   
-JSR @42     # Se foi pressionado, entra na subrotina de incremento  *************
-NOP
-JMP @104     # *************
-STA @511
-LDA @0      # Carrega valor das unidades 
-SOMA @19    # Soma com constante 1
-CEQ @20     # Compara com a constante 10 para verificar o "vai 1"
-JEQ @50     # Se for 10, pula para a casa das dezenas. Senão, atualiza o HEX0 com o próximo valor *************
-STA @0      # Armazena valor incrementado
-STA @288    # Carrega HEX0 com novo valor   
-RET
-LDI $0
-STA @0
-STA @288    # Carrega HEX0 com 0
-LDA @1
-SOMA @19    # Soma com constante 1
-CEQ @20     # Compara com a constante 10 para verificar o "vai 1"
-JEQ @60     # Se for 10, pula para a casa das centenas. Senão, atualiza o HEX1 com o próximo valor *************
-STA @1      # Armazena valor incrementado
-STA @289    # Carrega HEX1 com novo valor  
-RET
-LDI $0
-STA @1
-STA @289    # Carrega HEX1 com 0
-LDA @2
-SOMA @19    # Soma com constante 1
-CEQ @20     # Compara com a constante 10 para verificar o "vai 1"
-JEQ @70     # Se for 10, pula para a casa das unidades de milhares. Senão, atualiza o HEX2 com o próximo valor *************
-STA @2      # Armazena valor incrementado
-STA @290    # Carrega HEX2 com novo valor 
-RET
-LDI $0
-STA @2      
-STA @290    # Carrega HEX2 com 0
-LDA @3
-SOMA @19    # Soma com constante 1
-CEQ @20     # Compara com a constante 10 para verificar o "vai 1"
-JEQ @80     # Se for 10, pula para a casa das dezenas de milhares. Senão, atualiza o HEX3 com o próximo valor *************
-STA @3      # Armazena valor incrementado
-STA @291    # Carrega HEX3 com novo valor 
-RET
-LDI $0
-STA @3      
-STA @291    # Carrega HEX3 com 0
-LDA @4
-SOMA @19    # Soma com constante 1
-CEQ @20     # Compara com a constante 10 para verificar o "vai 1"
-JEQ @90     # Se for 10, pula para a casa das centenas de milhares. Senão, atualiza o HEX4 com o próximo valor *************
-STA @4      # Armazena valor incrementado
-STA @292    # Carrega HEX4 com novo valor 
-RET
-LDI $0
-STA @4
-STA @292    # Carrega HEX4 com 0
-LDA @5
-SOMA @19    # Soma com constante 1
-CEQ @20     # Compara com a constante 10 para verificar o "vai 1"
-JEQ @100    # Se for 10, ativa LED de OVERFLOW e flag de inibir contagem. Senão, atualiza o HEX5 com o próximo valor *************
-STA @5      # Armazena valor incrementado
-STA @293    # Carrega HEX5 com novo valor 
+LDI $1      #- INICIO LOOP PRINCIPAL -----------------------------------------  (A)<-
+CEQ @352    #Le o estado do KEY0
+JEQ @132     # Desvia para subrotina de incrementar a contagem (guardar endereço da linha de subrotina)  (Z)->
+JSR @33     # Escrever os valores das variáveis nos respectivos displays
+LDA @0      # Carrega o acumulador com a leitura de MEM[0]
+STA @288    # Armazena o valor lido em HEX0
+LDA @1      # Carrega o acumulador com a leitura de MEM[1]
+STA @289    # Armazena o valor lido em HEX1
+LDA @2      # Carrega o acumulador com a leitura de MEM[2]
+STA @ 290   # Armazena o valor lido em HEX2
+LDA @3      # Carrega o acumulador com a leitura de MEM[3]
+STA @291    # Armazena o valor lido em HEX3
+LDA @4      # Carrega o acumulador com a leitura de MEM[4]
+STA @292    # Armazena o valor lido em HEX4
+LDA @5      # Carrega o acumulador com a leitura de MEM[5]
+STA @293    # Armazena o valor lido em HEX5
 RET
 LDI $1
-STA @258    # Ativando LED de OVERFLOW (LDR9)
-STA @21
-RET
-LDA @356    # LEITURA DO FPGA_RESET
-CEQ @18     
-JEQ @128    # Se não foi pressionado, permanece no loop e volta para o inicio *************                   
-JSR @110    # Se foi pressionado, entra na subrotina de reset  *************
-NOP
-JMP @128
-STA @510
-LDI $0
-STA @0
-STA @1
-STA @2
-STA @3
-STA @4
-STA @5
-STA @288	
-STA @289	
-STA @290	
-STA @291	
-STA @292	
-STA @293	
-STA @256	
-STA @257	 
-STA @258	
-RET 
-JMP @35     # Endereço de inicio do LOOP
-
---------------------------------------------------------------------------------------------
+CEQ @353    #Le o estado do KEY1 
+JEQ @40     #....Desvia para MODIFICAR LIMITE (se apertado)                     ->(C)
+JSR @90     #....Verificar se o limite de contagem foi alcançado                (D)<- chegada | ->(E) saida
+LDI $1
+CEQ @356    #Le o FPGA_RESET (Se tiver apertado desvia para sub-rotina)
+JEQ @0      #....Desvia para RESETAR A CONTAGEM (reaproveitei o setup)          ->(B)
+JMP @28     #FIM DO LOOP PRINCIPAL -------------------------------------------  ->(A)
 LDI $0      #   -> POSICAO 0 <-----------------------------------               (C)<-
 CGT @7      #Se POSICAO CONTAGEM > 0
 JGT @49     #Proximo                                                            ->(G1)
@@ -205,4 +132,57 @@ JGT @114     #Pula para correcao de valor                                       
 RET
 LDA @10     #CORRIGE VALOR DE HEX0                                              (F6)<-
 STA @0      #HEX0 volta para o limite
+RET
+JSR @132     # Subrotina para incrementar contagem
+LDA @0
+SOMA @19
+CEQ @18
+JEQ @144  
+STA @0
+JMP @189
+LDI $0 # Incrementar dezenas (pos 1)
+STA @0
+LDA @1
+SOMA @19
+CEQ @18
+JEQ @152
+STA @1
+JMP @189
+LDI $0 # Incrementar centenas (pos 2)
+STA @1
+LDA @2
+SOMA @19
+CEQ @18
+JEQ @160
+STA @2
+JMP @189
+LDI $0 # Incrementar milhares (pos 3)
+STA @2
+LDA @3
+SOMA @19
+CEQ @18
+JEQ @168
+STA @3
+JMP @189
+LDI $0 # Incrementar dezenas de milhar (pos 4)
+STA @3
+LDA @4
+SOMA @19
+CEQ @18
+JEQ @176
+STA @4
+JMP @189
+LDI $0 # Incrementar centenas de milhar (pos 5)
+STA @4
+LDA @5
+SOMA @19
+CEQ @18
+JEQ @184
+STA @5
+JMP @189
+LDI $0 # OVERFLOW: seta flag de inibição e acende LED
+STA @5
+LDI $1
+STA @6         # Flag para inibir contagem
+STA @257       # LED de OVERFLOW
 RET
