@@ -127,82 +127,94 @@ STA @257
 STA @258	
 RET 
 CEQ @353    #Le o estado do KEY1 
-JEQ @132     #....Desvia para MODIFICAR LIMITE (se apertado)                     ->(C)
-JSR @182    #....Verificar se o limite de contagem foi alcançado                (D)<- chegada | ->(E) saida
+JEQ @132    #....Desvia para MODIFICAR LIMITE (se apertado)                     ->(C)
+JSR @194    #....Verificar se o limite de contagem foi alcançado                (D)<- chegada | ->(E) saida
 JMP @35     # Endereço de inicio do LOOP
 LDI $0      #   -> POSICAO 0 <-----------------------------------               (C)<-
 CGT @7      #Se POSICAO CONTAGEM > 0
-JGT @141    #Proximo                                                            ->(G1)
+JGT @143    #Proximo                                                            ->(G1)
 LDA @320    #Carrega: SW0 ~ SW7
 STA @10     #LIMITE HEX0 = Valor SW0 ~ SW7
+LDI $1
+STA @256    #Liga os leds das posicoes configuradas
 LDI $1
 SOMA @7     #Proxima posicao
 STA @7      #Salva proxima posicao
 JMP @130    #Volta                                                              ->(D)
 LDI $1      #   -> POSICAO 1 <-----------------------------------               (G1)<-
 CGT @7      #Se POSICAO CONTAGEM > 1
-JGT @150    #Proximo                                                            ->(G2)
+JGT @154    #Proximo                                                            ->(G2)
 LDA @320    #Carrega: SW0 ~ SW7
 STA @11     #LIMITE HEX1 = Valor SW0 ~ SW7
+LDI $3
+STA @256    #Liga os leds das posicoes configuradas
 LDI $1
 SOMA @7     #Proxima posicao
 STA @7      #Salva proxima posicao
 JMP @130    #Volta                                                              ->(D)
 LDI $2      #   -> POSICAO 2 <----------------------------------                (G2)<-
 CGT @7      #Se POSICAO CONTAGEM > 2
-JGT @159    #Proximo                                                            ->(G3)
+JGT @165    #Proximo                                                            ->(G3)
 LDA @320    #Carrega: SW0 ~ SW7
 STA @12     #LIMITE HEX2 = Valor SW0 ~ SW7
+LDI $7
+STA @256    #Liga os leds das posicoes configuradas
 LDI $1
 SOMA @7     #Proxima posicao
 STA @7      #Salva proxima posicao
 JMP @130    #Volta                                                              ->(D)
 LDI $3      #   -> POSICAO 3 <----------------------------------                (G3)<-
 CGT @7      #Se POSICAO CONTAGEM > 3
-JGT @168    #Proximo                                                            ->(G4)
+JGT @176    #Proximo                                                            ->(G4)
 LDA @320    #Carrega: SW0 ~ SW7
 STA @13     #LIMITE HEX3 = Valor SW0 ~ SW7
+LDI $15
+STA @256    #Liga os leds das posicoes configuradas
 LDI $1
 SOMA @7     #Proxima posicao
 STA @7      #Salva proxima posicao
 JMP @130    #Volta                                                              ->(D)
 LDI $4      #   -> POSICAO 4 <----------------------------------                (G4)<-
 CGT @7      #Se POSICAO CONTAGEM > 4
-JGT @177    #Proximo                                                            ->(G5)
+JGT @187    #Proximo                                                            ->(G5)
 LDA @320    #Carrega: SW0 ~ SW7
 STA @14     #LIMITE HEX4 = Valor SW0 ~ SW7
+LDI $31
+STA @256    #Liga os leds das posicoes configuradas
 LDI $1
 SOMA @7     #Proxima posicao
 STA @7      #Salva proxima posicao
 JMP @130    #Volta                                                              ->(D)
 LDA @320    #   -> POSICAO 5 <----------------------------------                (G5)<-
 STA @15     #LIMITE HEX5 = Valor SW0 ~ SW7
+LDI $63
+STA @256    #Liga os leds das posicoes configuradas
 LDI $0
 STA @7      #Reseta a posicao
 JMP @130    #Volta                                                              ->(D)
 LDA @15     # => LIMITE POS. 5 <===============================                 (E)<-
 CEQ @5      #Se HEX5 no limite
-JEQ @186    #Verifica o Proximo                                                 ->(F1)
+JEQ @198    #Verifica o Proximo                                                 ->(F1)
 RET
 LDA @14     # => LIMITE POS. 4 <===============================                 (F1)<-
 CEQ @4      #Se HEX4 no limite
-JEQ @190     #Verifica o Proximo                                                 ->(F2)
+JEQ @202     #Verifica o Proximo                                                 ->(F2)
 RET
 LDA @13     # => LIMITE POS. 3 <===============================                 (F2)<-
 CEQ @3      #Se HEX3 no limite
-JEQ @194    #Verifica o Proximo                                                 ->(F3)
+JEQ @206    #Verifica o Proximo                                                 ->(F3)
 RET
 LDA @12     # => LIMITE POS. 2 <===============================                 (F3)<-
 CEQ @2      #Se HEX2 no limite
-JEQ @198     #Verifica o Proximo                                                 ->(F4)
+JEQ @210     #Verifica o Proximo                                                 ->(F4)
 RET
 LDA @11     # => LIMITE POS. 1 <===============================                 (F4)<-
 CEQ @1      #Se HEX1 no limite
-JEQ @202     #Verifica o Proximo                                                 ->(F5)
+JEQ @214     #Verifica o Proximo                                                 ->(F5)
 RET
 LDA @10     # => LIMITE POS. 0 <===============================                 (F5)<-
 CGT @0      #Se HEX0 PASSOU e outros no limite
-JGT @206     #Pula para correcao de valor                                        ->(F6)
+JGT @218     #Pula para correcao de valor                                        ->(F6)
 RET
 LDA @10     #CORRIGE VALOR DE HEX0                                              (F6)<-
 STA @0      #HEX0 volta para o limite
