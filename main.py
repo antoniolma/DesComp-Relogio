@@ -72,12 +72,11 @@ Regras:
 
 
 
-inputASM = 'ASM.txt' #Arquivo de entrada de contém o assembly
+inputASM = 'ASM_relogio.txt' #Arquivo de entrada de contém o assembly
 outputBIN = 'BIN.txt' #Arquivo de saída que contém o binário formatado para VHDL
 outputMIF = 'initROM.mif' #Arquivo de saída que contém o binário formatado para .mif
 
 noveBits = True
-
 
 #definição dos mnemônicos e seus
 #respectivo OPCODEs (em Hexadecimal)
@@ -173,11 +172,11 @@ def trataMnemonico(line):
     
 
 
-with open(inputASM, "r") as f: #Abre o arquivo ASM
+with open('arq/' + inputASM, "r") as f: #Abre o arquivo ASM
     lines = f.readlines() #Verifica a quantidade de linhas
     
     
-with open(outputBIN, "w+") as f:  #Abre o destino BIN
+with open('arq/' + outputBIN, "w+") as f:  #Abre o destino BIN
 
     cont = 0 #Cria uma variável para contagem
     
@@ -234,16 +233,16 @@ with open(outputBIN, "w+") as f:  #Abre o destino BIN
 ############################             
 ############################
             
-with open(outputMIF, "r") as f: #Abre o arquivo .mif
+with open('arq/' + outputMIF, "r") as f: #Abre o arquivo .mif
     headerMIF = f.readlines() #Faz a leitura das linhas do arquivo,
                               #para fazer a aquisição do header
     
     
-with open(outputBIN, "r") as f: #Abre o arquivo BIN
+with open('arq/' + outputBIN, "r") as f: #Abre o arquivo BIN
     lines = f.readlines() #Faz a leitura das linhas do arquivo
     
     
-with open(outputMIF, "w") as f:  #Abre o destino .mif novamente
+with open('arq/' + outputMIF, "w") as f:  #Abre o destino .mif novamente
                                  #agora para preenchê-lo com o pograma
 
     cont = 0 #Cria uma variável para contagem
