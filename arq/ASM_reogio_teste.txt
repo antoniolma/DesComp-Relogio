@@ -1,0 +1,47 @@
+LDI $0		#Carrega o acumulador com o valor 0                                 (B)<-
+STA @511	#Limpa Leitura KEY0
+STA @510	#" Leitura KEY1
+STA @288	#" HEX0
+STA @289	#" HEX1
+STA @290	#" HEX2
+STA @291	#" HEX3
+STA @292	#" HEX4
+STA @293	#" HEX5
+STA @0		#" MEM[0] (segundos) +++++++++++++++ Horario oficial
+STA @1		#" MEM[1] (dezenas segundos)
+STA @2		#" MEM[2] (minutos)
+STA @3		#" MEM[3] (dezenas minutos)
+STA @4		#" MEM[4] (horas)
+STA @5		#" MEM[5] (dezenas horas)
+STA @7      #" Posicao contagem
+STA @256	#" LDR0 ~ LDR7
+STA @257	#" LDR8 
+STA @258	#" LDR9
+LDI $0
+STA @10     #" LIMITE (segundos)           = 0
+STA @11     #" LIMITE (dezenas segundos)   = 6
+STA @12     #" LIMITE (minutos)            = 0
+STA @13     #" LIMITE (dezenas minutos)    = 6
+STA @14     #" LIMITE (horas)              = 4
+STA @15     #" LIMITE (dezenas horas)      = 2
+LDI $0
+STA @17     #" Posicao para limite
+NOP         # INICIO LOOP PRINCIPAL -----------------------------------------   <-(A)
+JSR @--     #Verifica [KEY0] : Muda AM/PM para relogio 24 horas                 (B)->
+NOP
+CEQ @--     #Le o estado do KEYX
+JEQ @--     #....Desvia para aumentar os valores da contagem
+JSR @--     #....Escrever os valores das variáveis nos respectivos displays
+NOP
+LDI $1
+CEQ @356    #Le o FPGA_RESET (Se tiver apertado desvia para sub-rotina)
+JEQ @--     #....Desvia para RESETAR A CONTAGEM (reaproveitei o setup)
+NOP
+JSR @--     #....Verifica se passou do limite
+JMP @--     #FIM DO LOOP PRINCIPAL -------------------------------------------  (A)->
+LDI $1      #                                                                   <-(B)
+CEQ @352    #Le o estado do [KEY1]
+JEQ @--     #....Desvia para MODIFICAR LIMITE (se apertado)
+NOP         #TROCAR: Indicação base em 12 horas (AM/PM) ou 24 horas
+NOP         #....Implementar JLT e CLT para isso
+RET

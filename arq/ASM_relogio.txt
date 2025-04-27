@@ -1,0 +1,43 @@
+LDI $0		#Carrega o acumulador com o valor 0                                 (B)<-
+STA @10     #Limpa LIMITE (unidades)
+STA @11     #" LIMITE (dezenas)
+STA @12     #" LIMITE (centenas)
+STA @13     #" LIMITE (milhares)
+STA @14     #" LIMITE (dezenas de m.)
+STA @15     #" LIMITE (centenas de m.)
+STA @16     #" LIMITE Contagem total
+STA @17     #" Posicao para limite
+STA @511	#" Leitura KEY0
+STA @510	#" Leitura KEY1
+STA @288	#" HEX0
+STA @289	#" HEX1
+STA @290	#" HEX2
+STA @291	#" HEX3
+STA @292	#" HEX4
+STA @293	#" HEX5
+STA @256	#" LDR0 ~ LDR7
+STA @257	#" LDR8 
+STA @258	#" LDR9
+STA @0		#" MEM[0] (unidades)
+STA @1		#" MEM[1] (dezenas)
+STA @2		#" MEM[2] (centenas)
+STA @3		#" MEM[3] (milhares)
+STA @4		#" MEM[4] (dezenas de m.)
+STA @5		#" MEM[5] (centenas de m.)
+STA @6      #" Contagem total
+STA @7      #" Posicao contagem
+LDI $1      #- INICIO LOOP PRINCIPAL -----------------------------------------  <-(A)
+CEQ @352    #Le o estado do KEY0
+JEQ @--     #....Desvia para aumentar os valores da contagem
+JSR @--     #....Escrever os valores das variáveis nos respectivos displays
+JSR @--     #Sub-rotina para verificar [KEY1]                                   (B)->                            
+LDI $1
+CEQ @356    #Le o FPGA_RESET (Se tiver apertado desvia para sub-rotina)
+JEQ @--     #....Desvia para RESETAR A CONTAGEM (reaproveitei o setup)
+JMP @--     #FIM DO LOOP PRINCIPAL -------------------------------------------  (A)->
+LDI $1      #                                                                   <-(B)
+CEQ @353    #Le o estado do [KEY1]
+JEQ @--     #....Desvia para MODIFICAR LIMITE (se apertado)
+NOP         #TROCAR: Indicação base em 12 horas (AM/PM) ou 24 horas
+NOP         #....Implementar JLT e CLT para isso
+RET
