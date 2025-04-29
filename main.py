@@ -72,7 +72,7 @@ Regras:
 
 
 
-inputASM = 'ASM_relogio.txt' #Arquivo de entrada de contém o assembly
+inputASM = 'ASM.txt' #Arquivo de entrada de contém o assembly
 outputBIN = 'BIN.txt' #Arquivo de saída que contém o binário formatado para VHDL
 outputMIF = 'initROM.mif' #Arquivo de saída que contém o binário formatado para .mif
 
