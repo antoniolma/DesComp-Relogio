@@ -1,8 +1,20 @@
 Projeto 1: Relógio
-- Adicionar AM/PM <==> 24h                    } -> Meio conceito
+- Adicionar AM/PM <==> 24h                                           } -> Meio conceito
+- Configuracao das horas: KEY3 aumenta as horas, KEY2 aumenta os minutos. } -> Meio conceito
 - Instruções novas:
-    - ADDi: Adiciona Imediato (A = A + I)     }
-    - SUBi: Subtrai Imediato  (A = A - I)     } -> Meio conceito
-    - CEQi: Compare if Equal  (if A - I = 0)  }
-    - CLT:  Compare if Less Than         }
-    - JLT:  Jump if Less Than            }      -> Meio conceito
+    - ADDi: Adiciona Imediato (A = A + I)                            } (FEITO)
+    - SUBi: Subtrai Imediato  (A = A - I)                            } -> Meio conceito
+    - CEQi: Compare if Equal  (if A - I = 0)                         }
+    - CLT:  Compare if Less Than                             }
+    - JLT:  Jump if Less Than                                }  -> Meio conceito
+
+
+Nery:
+    - Base tempo
+    - Botoes para configuracao das horas (KEY3 e KEY2)
+    - CLT e SUBi
+
+Antonio:
+    - Aumentar bit opcode
+    - Base 12/24 horas
+    - JLT e CEQi
