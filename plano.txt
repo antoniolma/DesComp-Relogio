@@ -9,6 +9,10 @@ Projeto 1: Relógio
     - JLT:  Jump if Less Than                                }  -> Meio conceito
 
 
+Nota: A+
+
+(MANUAL DE USO)
+
 Nery:
     - Base tempo
     - Botoes para configuracao das horas (KEY3 e KEY2)
@@ -17,4 +21,4 @@ Nery:
 Antonio:
     - Aumentar bit opcode
     - Base 12/24 horas
-    - JLT e CEQi
+    - JLT, CEQi e ADDi
