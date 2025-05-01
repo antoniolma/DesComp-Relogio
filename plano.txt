@@ -22,3 +22,4 @@ Antonio:
     - Aumentar bit opcode
     - Base 12/24 horas
     - JLT, CEQi e ADDi
+    - Adicionar LABELS no codigo

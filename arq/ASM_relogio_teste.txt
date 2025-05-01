@@ -27,21 +27,36 @@ STA @15     #" LIMITE (dezenas horas)      = 2
 LDI $0
 STA @17     #" Posicao para limite
 NOP         # INICIO LOOP PRINCIPAL -----------------------------------------   <-(A)
-JSR @--     #Verifica [KEY0] : Muda AM/PM para relogio 24 horas                 (B)->
+CEQ @CAIO     #Le o estado do KEY0
+JEQ @JOAQUIM     #....Desvia para aumentar os valores da contagem
+JSR @CAIO     #....Escrever os valores das variáveis nos respectivos displays
 NOP
-CEQ @--     #Le o estado do KEYX
-JEQ @--     #....Desvia para aumentar os valores da contagem
-JSR @--     #....Escrever os valores das variáveis nos respectivos displays
+JSR @CAIO     #Verifica [KEY1] : Muda AM/PM para relogio 24 horas                 (B)->
+NOP
+JSR @CAIO     #Verifica [KEY2] : Config. Minutos (Adiciona 1 aos minutos)
+NOP
+JSR @CAIO     #Verifica [KEY3] : Config. Horas (Adiciona 1 as horas)
 NOP
 LDI $1
 CEQ @356    #Le o FPGA_RESET (Se tiver apertado desvia para sub-rotina)
-JEQ @--     #....Desvia para RESETAR A CONTAGEM (reaproveitei o setup)
+JEQ @CAIO     #....Desvia para RESETAR A CONTAGEM (reaproveitei o setup)
 NOP
-JSR @--     #....Verifica se passou do limite
-JMP @--     #FIM DO LOOP PRINCIPAL -------------------------------------------  (A)->
+JSR @CAIO     #....Verifica se passou do limite
+JMP @CAIO     #FIM DO LOOP PRINCIPAL -------------------------------------------  (A)->
 LDI $1      #                                                                   <-(B)
 CEQ @352    #Le o estado do [KEY1]
-JEQ @--     #....Desvia para MODIFICAR LIMITE (se apertado)
+JEQ @Michael     #....Desvia para MODIFICAR LIMITE (se apertado)
 NOP         #TROCAR: Indicação base em 12 horas (AM/PM) ou 24 horas
 NOP         #....Implementar JLT e CLT para isso
 RET
+CAIO:
+    STA @10
+
+JOAQUIM:
+    STA @10
+Michael:
+    STA @10
+
+
+        
+    
