@@ -1,0 +1,25 @@
+  opcode    Reg   Imd/Said Reg/    
+- - - - - | - - | -
+    5	     2     11
+
+ 
+-- Teste SUBi e CEQi
+LDI R0, $10  -- R0 = 10
+STR R0, @0   -- M[0] = RO
+LDI R1, $20  -- Salva 20 no R1
+CEQi R1, @10 -- if R1 == 10
+JEQ @7       -- 	 JEQ 7
+SUBi R1, $10 -- R1 = R1 - 10
+CEQi R1, $10 -- if R1 == 10
+JEQ  @0      --   JEQ 0
+
+
+-- Teste CLT e JLT
+LDI R0, $10  -- R0 = 10
+STR R0, @0   -- M[0] = Ro
+LDI R1, $20  -- R1 = 20
+CLT R1, @0   -- if R1 < M[0]
+JLT @7       --    JLT 7
+SUBi R1, $11 -- R1 = 9
+CLT R1, @0   -- if R1 < M[0]
+JLT @0       --    JLT 0
