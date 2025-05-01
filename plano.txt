@@ -17,9 +17,12 @@ Nery:
     - Base tempo
     - Botoes para configuracao das horas (KEY3 e KEY2)
     - CLT e SUBi
+    - Adaptação para a arquitetura registrador-memória
+    - Montador assembler
 
 Antonio:
     - Aumentar bit opcode
     - Base 12/24 horas
     - JLT, CEQi e ADDi
     - Adicionar LABELS no codigo
+    - Montador assembler
