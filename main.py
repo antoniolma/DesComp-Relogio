@@ -82,11 +82,11 @@ noveBits = True
 #respectivo OPCODEs (em Hexadecimal)
 mne =	{ 
        "NOP":   "0",
-       "LDA":   "1",
+       "LDR":   "1",
        "SOMA":  "2",
        "SUB":   "3",
        "LDI":   "4",
-       "STA":   "5",
+       "STR":   "5",
        "JMP":   "6",
        "JEQ":   "7",
        "CEQ":   "8",
@@ -94,8 +94,15 @@ mne =	{
        "RET":   "A",
        "ADDi":  "B",
        "CGT":   "C",
-       "JGT":   "D"
+       "JGT":   "D",
+       "SUBi":  "E",
+       "CLT":   "F",
+       "JLT":   "1F",
+       "CEQi":  "2F"
 }
+
+# Registradores simbólicos R0 a R15
+reg_map = {f"R{i}": f"{format(i, '04b')}" for i in range(16)}
 
 #Converte o valor após o caractere arroba '@'
 #em um valor hexadecimal de 2 dígitos (8 bits)
@@ -169,12 +176,10 @@ def trataMnemonico(line):
     line[0] = mne[line[0]]
     line = "".join(line)
     return line
-    
 
-
+   
 with open('arq/' + inputASM, "r") as f: #Abre o arquivo ASM
     lines = f.readlines() #Verifica a quantidade de linhas
-    
     
 with open('arq/' + outputBIN, "w+") as f:  #Abre o destino BIN
 
@@ -224,8 +229,6 @@ with open('arq/' + outputBIN, "w+") as f:  #Abre o destino BIN
             f.write(line) #Escreve no arquivo BIN.txt
             
             print(line,end = '') #Print apenas para debug
-            
-
             
 ############################             
 ############################            
