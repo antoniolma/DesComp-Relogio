@@ -1,7 +1,0 @@
-JMP @3
-LDI R0, $0
-RET
-LDI R0, $10
-STR R0, @0
-JSR @0
-NOP

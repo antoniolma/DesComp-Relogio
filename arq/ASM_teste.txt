@@ -1,0 +1,15 @@
+START:
+LDI R0, $1   # R0 = 1
+STR R0, @0   # M[0] = R0
+
+LOOP:
+LDR R0, @0   # R0 = M[0]
+ADDi R0, $2  # R0 += 2
+STR R0, @0   # M[0] = R0
+CEQi R0, $11 # if R0 == 11
+JEQ @END     # Termina o codigo
+JMP @LOOP    # Volta pro inicio
+
+END:
+LDI R1, $1   # R1 = 1
+STR R1, @1

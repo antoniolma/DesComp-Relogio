@@ -7,6 +7,9 @@ Lê 'ASM.txt' e produz:
   - 'initROM.mif' com conteúdo binário puro.
 """
 
+# Para facilitar a troca de qual arquivo deve ser lido e onde escrever (na main())
+teste = True
+
 # Mnemônico => opcode (hexadecimal, 5 bits)
 mne = {
     "NOP":   "0", "LDR":   "1",  "SOMA":  "2",
@@ -20,54 +23,39 @@ mne = {
 # Registradores R0–R7 => 3 bits
 reg_map = { f"R{i}": format(i, '03b') for i in range(8) }
 
-# 
-
 def parse_line(line):
-    """Retorna (mnemonic, operands, comment) ou None se inválida."""
-    # ignora linhas vazias, comentários puros ou iniciadas por espaço
-    if line.startswith(' ') or not line.strip() or line.lstrip().startswith('#'):
+    """Retorna (mnemonic, operands, comment) ou None se for label/vazia/comentário."""
+    raw = line.strip()
+    # label?
+    if raw.endswith(':'):
+        return ('LABEL', raw[:-1], None)
+    # ignora linhas vazias, comente puro ou iniciadas em espaço
+    if not raw or raw.startswith('#') or line.startswith(' '):
         return None
-
-    # separa comentário
-    parts = line.strip().split('#', 1)
+    parts = raw.split('#',1)
     instr   = parts[0].strip()
-    comment = parts[1].strip() if len(parts) > 1 else instr
-
-    # usa split(None,1) para separar MNEMONIC do resto
-    tokens = instr.split(None, 1)
+    comment = parts[1].strip() if len(parts)>1 else instr
+    tokens = instr.split(None,1)
     mnemonic = tokens[0]
-    operands = tokens[1] if len(tokens) > 1 else ""
-
+    operands = tokens[1] if len(tokens)>1 else ""
     return mnemonic, operands, comment
 
-def encode_operand(token: str):
-    """
-    Recebe:
-      - '@123'  => address
-      - '$45'   => imediato
-    Retorna (bit_ms, hex8):
-      - bit_ms  = '1' se valor>255, senão '0'
-      - hex8 = valor_low em 2 dígitos hex (00–FF)
-    """
-    # limpa eventual espaço
+def encode_operand(token, label_map):
     token = token.strip()
-
-    if token.startswith('@'):
-        val = int(token[1:])
-    elif token.startswith('$'):
-        val = int(token[1:])
-    elif token.isdigit():
-        val = int(token)
+    # referência a label?
+    if token.startswith('@') and not token[1:].isdigit():
+        val = label_map[token[1:]]
     else:
-        # sem operando
-        return '0', '00'
+        # cai na sua lógica antiga para @$ e dígitos
+        if token.startswith('@') or token.startswith('$') or token.isdigit():
+            val = int(token.lstrip('@$'))
+        else:
+            return '0','00'
+    msb = '1' if val>255 else '0'
+    low = val-256 if val>255 else val
+    return msb, format(low,'02X')
 
-    bit_ms = '1' if val > 255 else '0'
-    low = val - 256 if val > 255 else val
-    # **02X** garante '0A','0B',...'FF'
-    return bit_ms, format(low, '02X')
-
-def assemble_instruction(mnemonic: str, operands: str):
+def assemble_instruction(mnemonic: str, operands: str, label_map):
     # 1) opcode 5 bits
     code = int(mne[mnemonic], 16)
     op5 = format(code, '05b')
@@ -76,41 +64,66 @@ def assemble_instruction(mnemonic: str, operands: str):
     if mnemonic == "RET":
         rd3 = reg_map["R0"]
     else:
-        # extrai Rd antes da vírgula, ou usa R0 por padrão
         if ',' in operands:
             rd_tok = operands.split(',',1)[0].strip()
         else:
             rd_tok = "R0"
         rd3 = reg_map.get(rd_tok, reg_map["R0"])
 
-    # 3) Identifica o operando para MSB+8 bits
+    # 3) inicializa tok para o operando
     tok = None
+
+    #    branches e JSR usam o próprio operando
     if mnemonic in ("JMP", "JEQ", "JLT", "JGT", "JSR"):
         tok = operands.strip()
+    #    instruções com vírgula pegam só o segundo pedaço
     elif ',' in operands:
         tok = operands.split(',', 1)[1].strip()
 
     # 4) Codifica MSB + 8 bits
     if tok:
-        bit_ms, hex8 = encode_operand(tok)
+        bit_ms, hex8 = encode_operand(tok, label_map)
     else:
         bit_ms, hex8 = '0', '00'
 
     return op5, rd3, bit_ms, hex8
 
+
 def main():
+    # 1ª passagem: lê todas as linhas e constrói label_map + lista de instruções “puras”
+    if teste:
+        arq_leitura = "arq/ASM_teste.txt"
+    else:
+        arq_leitura = "arq/ASM.txt"
+
+    raw_lines = open(arq_leitura).read().splitlines()
+    label_map = {}
+    instr_lines = []
+    pc = 0
+    for line in raw_lines:
+        parsed = parse_line(line)
+        if parsed is None:
+            continue
+        if parsed[0] == 'LABEL':
+            label = parsed[1]
+            label_map[label] = pc
+        else:
+            instr_lines.append(line)
+            pc += 1
+
+    # 2ª passagem: monta cada instrução usando label_map
     instrs = []
-    with open("arq/ASM.txt") as f:
-        for line in f:
-            parsed = parse_line(line)
-            if not parsed:
-                continue
-            m, ops, c = parsed
-            op5, rd3, b, xx = assemble_instruction(m, ops)
-            instrs.append((op5, rd3, b, xx, c))
+    for line in instr_lines:
+        mnemonic, ops, comment = parse_line(line)
+        op5, rd3, b, xx = assemble_instruction(mnemonic, ops, label_map)
+        instrs.append((op5, rd3, b, xx, line))
 
     # gera BIN.txt
-    with open("arq/BIN.txt", "w") as f:
+    if teste:
+        arq_escrita = "arq/BIN_teste.txt"
+    else:
+        arq_escrita = "arq/BIN.txt"
+    with open(arq_escrita, "w") as f:
         for i, (op5, rd3, b, xx, comment) in enumerate(instrs):
             f.write(
                 f'tmp({i}) := "{op5}" & "{rd3}" & \'{b}\' & x"{xx}";\t-- {comment}\n'

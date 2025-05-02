@@ -7,14 +7,15 @@ Projeto 1: Relógio
     - CEQi: Compare if Equal  (if A - I = 0)                         }
     - CLT:  Compare if Less Than                             }
     - JLT:  Jump if Less Than                                }  -> Meio conceito
+- SW8 Velocidade média e SW9 velocidade rápida                       } -> Meio conceito
 
-
-Nota: A+
+Nota: A++
 
 (MANUAL DE USO)
 
 Nery:
     - Base tempo
+    - SW8 Velocidade média e SW9 velocidade rápida
     - Botoes para configuracao das horas (KEY3 e KEY2)
     - CLT e SUBi
 
