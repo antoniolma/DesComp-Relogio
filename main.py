@@ -7,30 +7,20 @@ Lê 'ASM.txt' e produz:
   - 'initROM.mif' com conteúdo binário puro.
 """
 
-# Mnemônico → opcode (hexadecimal, 5 bits)
+# Mnemônico => opcode (hexadecimal, 5 bits)
 mne = {
-    "NOP":   "0",
-    "LDR":   "1",
-    "SOMA":  "2",
-    "SUB":   "3",
-    "LDI":   "4",
-    "STR":   "5",
-    "JMP":   "6",
-    "JEQ":   "7",
-    "CEQ":   "8",
-    "JSR":   "9",
-    "RET":   "A",
-    "ADDi":  "B",
-    "CGT":   "C",
-    "JGT":   "D",
-    "SUBi":  "E",
-    "CLT":   "F",
-    "JLT":   "10",
-    "CEQi":  "11"
+    "NOP":   "0", "LDR":   "1",  "SOMA":  "2",
+    "SUB":   "3", "LDI":   "4",  "STR":   "5",
+    "JMP":   "6", "JEQ":   "7",  "CEQ":   "8",
+    "JSR":   "9", "RET":   "A",  "ADDi":  "B",
+    "CGT":   "C", "JGT":   "D",  "SUBi":  "E",
+    "CLT":   "F", "JLT":   "10", "CEQi":  "11"
 }
 
-# Registradores R0–R7 → 3 bits
+# Registradores R0–R7 => 3 bits
 reg_map = { f"R{i}": format(i, '03b') for i in range(8) }
+
+# 
 
 def parse_line(line):
     """Retorna (mnemonic, operands, comment) ou None se inválida."""
@@ -50,18 +40,13 @@ def parse_line(line):
 
     return mnemonic, operands, comment
 
-
-def to_bin(val, bits):
-    return format(val, f'0{bits}b')
-
 def encode_operand(token: str):
     """
     Recebe:
-      - '@123'  → address
-      - '$45'   → imediato
-      - '7'     → número puro (tratado como address/imediato)
-    Retorna (msb, hex8):
-      - msb  = '1' se valor>255, senão '0'
+      - '@123'  => address
+      - '$45'   => imediato
+    Retorna (bit_ms, hex8):
+      - bit_ms  = '1' se valor>255, senão '0'
       - hex8 = valor_low em 2 dígitos hex (00–FF)
     """
     # limpa eventual espaço
@@ -77,10 +62,10 @@ def encode_operand(token: str):
         # sem operando
         return '0', '00'
 
-    msb = '1' if val > 255 else '0'
+    bit_ms = '1' if val > 255 else '0'
     low = val - 256 if val > 255 else val
     # **02X** garante '0A','0B',...'FF'
-    return msb, format(low, '02X')
+    return bit_ms, format(low, '02X')
 
 def assemble_instruction(mnemonic: str, operands: str):
     # 1) opcode 5 bits
@@ -89,7 +74,7 @@ def assemble_instruction(mnemonic: str, operands: str):
 
     # 2) Registrador destino (3 bits)
     if mnemonic == "RET":
-        rd3 = reg_map["R7"]
+        rd3 = reg_map["R0"]
     else:
         # extrai Rd antes da vírgula, ou usa R0 por padrão
         if ',' in operands:
@@ -107,15 +92,15 @@ def assemble_instruction(mnemonic: str, operands: str):
 
     # 4) Codifica MSB + 8 bits
     if tok:
-        msb, hex8 = encode_operand(tok)
+        bit_ms, hex8 = encode_operand(tok)
     else:
-        msb, hex8 = '0', '00'
+        bit_ms, hex8 = '0', '00'
 
-    return op5, rd3, msb, hex8
+    return op5, rd3, bit_ms, hex8
 
 def main():
     instrs = []
-    with open("arq/ASM_relogio_teste.txt") as f:
+    with open("arq/ASM.txt") as f:
         for line in f:
             parsed = parse_line(line)
             if not parsed:

@@ -23,3 +23,25 @@ JLT @7       --    JLT 7
 SUBi R1, $11 -- R1 = 9
 CLT R1, @0   -- if R1 < M[0]
 JLT @0       --    JLT 0
+
+-- Adiciona 1 no HEX0
+LDI R0, $0
+STR R0, @511	#" Leitura KEY0
+STR R0, @0		#" MEM[0] (unidades)
+STR R0, @288	#" HEX0
+NOP
+STR R0, @511
+LDR R0, @0      # Carrega valor das unidades 
+SOMA R0, @19    # Soma com constante 1
+CEQi R0, $10    # Compara com a constante 10 para verificar o "vai 1"
+STR R0, @0      # Armazena valor incrementado
+STR R0, @288    # Carrega HEX0 com novo valor   
+
+-- Testa JSR e RET
+JMP @2
+LDI R0, $0
+RET
+LDI R0, $10
+STR R0, @0
+JSR @0
+NOP

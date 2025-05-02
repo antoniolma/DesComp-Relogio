@@ -1,8 +1,7 @@
-LDI R0, $10  # R0 = 10
-STR R0, @0   # M[0] = RO
-LDI R1, $20  # Salva 20 no R1
-CEQi R1, @10 # if R1 == 10
-JEQ @7       # 	 JEQ 7
-SUBi R1, $10 # R1 = R1 - 10
-CEQi R1, $10 # if R1 == 10
-JEQ  @0      #   JEQ 0
+JMP @3
+LDI R0, $0
+RET
+LDI R0, $10
+STR R0, @0
+JSR @0
+NOP
