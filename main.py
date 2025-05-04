@@ -8,7 +8,7 @@ Lê 'ASM.txt' e produz:
 """
 
 # Para facilitar a troca de qual arquivo deve ser lido e onde escrever (na main())
-teste = True
+teste = False
 
 # Mnemônico => opcode (hexadecimal, 5 bits)
 mne = {
