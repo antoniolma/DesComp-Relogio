@@ -1,23 +1,9 @@
-# Nao esta no setup, pq nao quero q esses valores sejam modificados
-# sem clicar no FPGA_RESET
-PRE_SETUP:
-LDI R0, $0
-STR R0, @9      # Soma das (APENAS) HORAS
-STR R0, @8      # MODO: 24 horas ou AM/PM (0 ou 1)
-LDI R0, $2
-STR R0, @6      # LIMITE de MEM[DezenasHoras] == 2
-LDI R0, $4
-STR R0, @7      # LIMITE de MEM[DezHoras] == 4
-LDI R0, $12
-STR R0, @12     # Constante 12
-LDI R0, $24
-STR R0, @10     # Limite horas
-LDI R0, 
-
 SETUP:
 LDI R0, $0		#Carrega o acumulador com o valor 0
 STR R0, @511	#" Leitura KEY0
 STR R0, @510	#" Leitura KEY1
+STR R0, @509    #" Leitura KEY2
+STR R0, @508    #" Leitura KEY3
 STR R0, @288	#" HEX0
 STR R0, @289	#" HEX1
 STR R0, @290	#" HEX2
@@ -33,22 +19,30 @@ STR R0, @2		#" MEM[2] (centenas)
 STR R0, @3		#" MEM[3] (milhares)
 STR R0, @4		#" MEM[4] (dezenas de m.)
 STR R0, @5		#" MEM[5] (centenas de m.)
-LDI R0, $0      
+STR R0, @9      # Contagem total
+LDI R0, $24
+STR R0, @10     # Limite horas
+
 
 # INICIO LOOP PRINCIPAL ----------------------------------------- 
 LOOP:
 LDR R0, @352    # Verifica KEY0
 CEQi R0, $0     # 
-JEQ @34         # ....Se não foi pressionado, permanece no loop                     (A) -->
+JEQ @27         # ....Se não foi pressionado, permanece no loop                     (A) -->
 JSR @SEGUNDOS   # ....Se foi pressionado, entra na subrotina de incremento
-LDR R0, @353    # Verifica KEY1                                                     <-- (A)
-CEQi R0, $0
-JEQ @38         # ....Se nao pressionado, permanece no loop                         (B) -->
-JSR @MUDA_HORA  # ....Se foi, entao subrotina para mudar tipo de hora
-LDR R0, @356    # Verifica FPGA_RESET                                               <-- (B)
-CEQi R0, $0     
+LDR R1, @354    # Verifica KEY2                                                     <-- (A)
+CEQi R1, $0
+JEQ @31         # ....Se não foi pressionado, permanece no loop                     (C) -->
+JSR @MINUTOS    # ....Se foi pressionado, entra na subrotina de incremento dos minutos
+LDR R2, @355    # Verifica KEY3                                                     <-- (C) 
+CEQi R2, $0
+JEQ @35         # ....Se não foi pressionado, permanece no loop                     (B) -->
+JSR @HORAS      # ....Se foi pressionado, entra na subrotina de incremento das horas
+LDR R3, @356    # Verifica FPGA_RESET                                               <-- (B)
+CEQi R3, $0     
 JEQ @LOOP       # ....Se não foi pressionado, permanece no loop e volta para o inicio 
 JMP @RESET      # ....Se foi, entao reseta todos os valores e volta pro loop
+
 
 # ROTINA DE INCREMENTO ------------------------------------------
 SEGUNDOS:
@@ -67,112 +61,87 @@ STR R0, @0
 STR R0, @288    # Carrega HEX0 com 0
 LDR R0, @1
 ADDi R0, $1     # Soma com constante 1
-CEQi R0, $1     # Compara com a constante 10 para verificar o "vai 1"
-JEQ @MINUTOS    # Se for 10, pula para a casa das centenas. Senão, atualiza o HEX1 com o próximo valor 
+CEQi R0, $6     # Compara com a constante 6 para verificar o "vai 1"
+JEQ @PRE_MINUTOS# Se for 10, pula para a casa das centenas. Senão, atualiza o HEX1 com o próximo valor 
 STR R0, @1      # Armazena valor incrementado
 STR R0, @289    # Carrega HEX1 com novo valor  
 RET
 
+PRE_MINUTOS:
+LDR R1, @1
+SUBi R1, $5
+STR R1, @1
+STR R1, @289    # Carrega HEX1 com 0
+
 MINUTOS:
-LDI R0, $0
-STR R0, @1
-STR R0, @289    # Carrega HEX1 com 0
-LDR R0, @2
-ADDi R0, $1     # Soma com constante 1
-CEQi R0, $10     # Compara com a constante 10 para verificar o "vai 1"
+STR R1, @509
+LDR R1, @2
+ADDi R1, $1     # Soma com constante 1
+CEQi R1, $10    # Compara com a constante 10 para verificar o "vai 1"
 JEQ @DEZ_MIN    # Se for 10, pula para a casa das unidades de milhares. Senão, atualiza o HEX2 com o próximo valor 
-STR R0, @2      # Armazena valor incrementado
-STR R0, @290    # Carrega HEX2 com novo valor 
+STR R1, @2      # Armazena valor incrementado
+STR R1, @290    # Carrega HEX2 com novo valor 
 RET
 
 DEZ_MIN:
-LDI R0, $0
-STR R0, @2      
-STR R0, @290    # Carrega HEX2 com 0
-LDR R0, @3
-ADDi R0, $1     # Soma com constante 1
-CEQi R0, $1     # Compara com a constante 10 para verificar o "vai 1"
-JEQ @HORAS      # Se for 10, pula para a casa das dezenas de milhares. Senão, atualiza o HEX3 com o próximo valor 
-STR R0, @3      # Armazena valor incrementado
-STR R0, @291    # Carrega HEX3 com novo valor 
+LDI R1, $0
+STR R1, @2      
+STR R1, @290    # Carrega HEX2 com 0
+LDR R1, @3
+ADDi R1, $1     # Soma com constante 1
+CEQi R1, $6     # Compara com a constante 6 para verificar o "vai 1"
+JEQ @PRE_HORAS  # Se for 10, pula para a casa das dezenas de milhares. Senão, atualiza o HEX3 com o próximo valor 
+STR R1, @3      # Armazena valor incrementado
+STR R1, @291    # Carrega HEX3 com novo valor 
 RET
 
+PRE_HORAS:
+LDR R2, @3
+SUBi R2, $5
+STR R2, @3
+STR R2, @291    # Carrega HEX3 com 0
+
 HORAS:
-LDR R0, @9
-ADDi R0, $1     # SOMA_HORAS += 1
-STR R0, @9
-CEQ R0, @10     # SOMA_HORAS == Limite ?
+STR R2, @508
+LDR R2, @9
+ADDi R2, $1     # SOMA_HORAS += 1
+STR R2, @9
+CEQ R2, @10     # SOMA_HORAS == Limite ?
 JEQ @RESET_2    # ....Reseta Contagem
-LDI R0, $0
-STR R0, @3      
-STR R0, @291    # Carrega HEX3 com 0
-LDR R0, @4
-ADDi R0, $1     # Soma com constante 1
-CEQi R0, $10    # Compara com a constante 10 para verificar o "vai 1"
+LDR R2, @4
+ADDi R2, $1     # Soma com constante 1
+CEQi R2, $10    # Compara com a constante 10 para verificar o "vai 1"
 JEQ @DEZ_HORAS  # Se for 10, pula para a casa das centenas de milhares. Senão, atualiza o HEX4 com o próximo valor 
-STR R0, @4      # Armazena valor incrementado
-STR R0, @292    # Carrega HEX4 com novo valor 
+STR R2, @4      # Armazena valor incrementado
+STR R2, @292    # Carrega HEX4 com novo valor 
 RET
 
 DEZ_HORAS:
-LDI R0, $0
-STR R0, @4
-STR R0, @292    # Carrega HEX4 com 0
-LDR R0, @5
-ADDi R0, $1     # Soma com constante 1
-STR R0, @5      # Armazena valor incrementado
-STR R0, @293    # Carrega HEX5 com novo valor 
-RET
-
-
-# ROTINA DE TROCA HORARIO ---------------------------------------
-MUDA_HORA:
-LDR R0, @8         # Verifica modo atual (0 = 24h, 1 = AM/PM)
-CEQi R0, $0
-JEQ @SET_AMPM      # se era 0, vai para definir AM/PM
-LDI R0, $0
-STR R0, @8         # MODO: 24 Horas
-LDI R0, $24
-STR R0, @10        # limite = 24
-RET 
-
-SET_AMPM:
-LDI R0, $1
-STR R0, @8        # MODO: AM/PM
-LDI R0, $12
-STR R0, @10       # limite = 12
-LDR R1, @9        # R1 = SOMA_HORAS
-CLT R1, @--       # SOMA_HORAS < 13?
-JLT @AMPM_RET     # ....não corrige
-SUBi R1, $12       # R1 = horas_brutas - 12 (1..11)
-CLT R1, @--       # R1 < 10?
-JLT @LESS10
-# R1 >= 10 (só pode ser 10 ou 11)
-LDI R2, $1
-STR R2, @5        # dezena = 1
-STR R2, @293      # HEX5 = 1
-SUBi R1, $10       # unidade = R1 - 10
-STR R1, @4
-STR R1, @292      # HEX4 = unidade
-RET
-
-LESS10:
 LDI R2, $0
-STR R2, @5        # dezena = 0
-STR R2, @293      # HEX5 = 0
-STR R1, @4        # unidade = R1
-STR R1, @292      # HEX4 = R1
-RET
-
-AMPM_RET:
+STR R2, @4
+STR R2, @292    # Carrega HEX4 com 0
+LDR R2, @5
+ADDi R2, $1     # Soma com constante 1
+STR R2, @5      # Armazena valor incrementado
+STR R2, @293    # Carrega HEX5 com novo valor 
 RET
 
 
 # ROTINA DE RESET -----------------------------------------------
 RESET:
-JMP @PRE_SETUP  # Se foi pressionado, entra na subrotina de reset
+JMP @SETUP      # Se foi pressionado, entra na subrotina de reset
 
 RESET_2:
 LDI R0, $0
-STR R0, @9      # Soma das (APENAS) HORAS
-JMP @SETUP
+CLT @9, $1
+JLT @109
+STR R0, @9      # Contagem total
+CLT @4, $1
+JLT @112
+STR R0, @4		#" MEM[4] (dezenas de m.)
+CLT @5, $1
+JLT @115
+STR R0, @5		#" MEM[5] (centenas de m.)
+STR R0, @292	#" HEX4
+STR R0, @293	#" HEX5
+JMP @LOOP
