@@ -12,6 +12,7 @@ LDI R0, $12
 STR R0, @12     # Constante 12
 LDI R0, $24
 STR R0, @10     # Limite horas
+LDI R0, 
 
 SETUP:
 LDI R0, $0		#Carrega o acumulador com o valor 0
@@ -38,9 +39,13 @@ LDI R0, $0
 LOOP:
 LDR R0, @352    # Verifica KEY0
 CEQi R0, $0     # 
-JEQ @34         # ....Se não foi pressionado, permanece no loop                    
-JSR @SEGUNDOS   # ....Se foi pressionado, entra na subrotina de incremento  
-LDR R0, @356    # Verifica FPGA_RESET 
+JEQ @34         # ....Se não foi pressionado, permanece no loop                     (A) -->
+JSR @SEGUNDOS   # ....Se foi pressionado, entra na subrotina de incremento
+LDR R0, @353    # Verifica KEY1                                                     <-- (A)
+CEQi R0, $0
+JEQ @38         # ....Se nao pressionado, permanece no loop                         (B) -->
+JSR @MUDA_HORA  # ....Se foi, entao subrotina para mudar tipo de hora
+LDR R0, @356    # Verifica FPGA_RESET                                               <-- (B)
 CEQi R0, $0     
 JEQ @LOOP       # ....Se não foi pressionado, permanece no loop e volta para o inicio 
 JMP @RESET      # ....Se foi, entao reseta todos os valores e volta pro loop
@@ -117,6 +122,49 @@ LDR R0, @5
 ADDi R0, $1     # Soma com constante 1
 STR R0, @5      # Armazena valor incrementado
 STR R0, @293    # Carrega HEX5 com novo valor 
+RET
+
+
+# ROTINA DE TROCA HORARIO ---------------------------------------
+MUDA_HORA:
+LDR R0, @8         # Verifica modo atual (0 = 24h, 1 = AM/PM)
+CEQi R0, $0
+JEQ @SET_AMPM      # se era 0, vai para definir AM/PM
+LDI R0, $0
+STR R0, @8         # MODO: 24 Horas
+LDI R0, $24
+STR R0, @10        # limite = 24
+RET 
+
+SET_AMPM:
+LDI R0, $1
+STR R0, @8        # MODO: AM/PM
+LDI R0, $12
+STR R0, @10       # limite = 12
+LDR R1, @9        # R1 = SOMA_HORAS
+CLT R1, @--       # SOMA_HORAS < 13?
+JLT @AMPM_RET     # ....não corrige
+SUBi R1, $12       # R1 = horas_brutas - 12 (1..11)
+CLT R1, @--       # R1 < 10?
+JLT @LESS10
+# R1 >= 10 (só pode ser 10 ou 11)
+LDI R2, $1
+STR R2, @5        # dezena = 1
+STR R2, @293      # HEX5 = 1
+SUBi R1, $10       # unidade = R1 - 10
+STR R1, @4
+STR R1, @292      # HEX4 = unidade
+RET
+
+LESS10:
+LDI R2, $0
+STR R2, @5        # dezena = 0
+STR R2, @293      # HEX5 = 0
+STR R1, @4        # unidade = R1
+STR R1, @292      # HEX4 = R1
+RET
+
+AMPM_RET:
 RET
 
 

@@ -1,5 +1,4 @@
 Projeto 1: Relógio
-- Adicionar AM/PM <==> 24h                                           } -> Meio conceito
 - Configuracao das horas: KEY3 aumenta as horas, KEY2 aumenta os minutos. } -> Meio conceito
 - Instruções novas:
     - ADDi: Adiciona Imediato (A = A + I)                            } (FEITO)
@@ -9,21 +8,24 @@ Projeto 1: Relógio
     - JLT:  Jump if Less Than                                } (FEITO) -> Meio conceito
 - SW8 Velocidade média e SW9 velocidade rápida                       } (FEITO) -> Meio conceito
 
-Nota: A++
+Nota: A+
 
 (MANUAL DE USO)
 
 Nery:
     - Base tempo
     - SW8 Velocidade média e SW9 velocidade rápida
-    - Botoes para configuracao das horas (KEY3 e KEY2)
+    - Botoes para configuracao das horas (KEY2)
     - CLT e SUBi
     - Adaptação para a arquitetura registrador-memória
     - Montador assembler
+    - Relatorio 
 
 Antonio:
     - Aumentar bit opcode
-    - Base 12/24 horas
     - JLT, CEQi e ADDi
+    - Botoes para configuracao das horas (KEY3)
     - Adicionar LABELS no codigo
     - Montador assembler
+    - Relatorio
+    - Manual de Instruções

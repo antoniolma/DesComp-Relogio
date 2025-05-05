@@ -96,7 +96,7 @@ def main():
     else:
         arq_leitura = "arq/ASM.txt"
 
-    raw_lines = open(arq_leitura).read().splitlines()
+    raw_lines = open(arq_leitura, encoding="utf-8", errors="ignore").read().splitlines()
     label_map = {}
     instr_lines = []
     pc = 0
@@ -123,14 +123,14 @@ def main():
         arq_escrita = "arq/BIN_teste.txt"
     else:
         arq_escrita = "arq/BIN.txt"
-    with open(arq_escrita, "w") as f:
+    with open(arq_escrita, "w", encoding="utf-8", errors="ignore") as f:
         for i, (op5, rd3, b, xx, comment) in enumerate(instrs):
             f.write(
                 f'tmp({i}) := "{op5}" & "{rd3}" & \'{b}\' & x"{xx}";\t-- {comment}\n'
             )
 
     # gera initROM.mif
-    with open("arq/initROM.mif", "w") as f:
+    with open("arq/initROM.mif", "w", encoding="utf-8", errors="ignore") as f:
         f.write("WIDTH=17;\n")
         f.write(f"DEPTH={len(instrs)};\n")
         f.write("ADDRESS_RADIX=DEC;\n")

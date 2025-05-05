@@ -1,17 +1,22 @@
 # Nao esta no setup, pq nao quero q esses valores sejam modificados
-# ao clicar no FPGA_RESET
+# sem clicar no FPGA_RESET
 PRE_SETUP:
 LDI R0, $0
-STR R0, @10     # Indicador se esta em mais que 12horas (para voltar de AM/PM)
 STR R0, @9      # Soma das (APENAS) HORAS
-STR R0, @11     # Ciclo: AM ou PM (0 ou 1)
-STR R0, @8      # "FlipFlop" pra saber se: 24 horas ou AM/PM
-LDI R0, $2
-STR R0, @6      # Seta o LIMITE de MEM[DezenasHoras] == 2
-LDI R0, $4
-STR R0, @7      # Seta o LIMITE de MEM[Horas] == 4
+STR R0, @8      # MODO: 24 horas ou AM/PM (0 ou 1)
+STR R0, @17     # Ciclo: AM ou PM (0 ou 1)
 LDI R0, $12
 STR R0, @12     # Constante 12
+LDI R0, $24
+STR R0, @13     # Constante 24
+LDI R0, $24
+STR R0, @10     # Limite horas
+LDI R0, $10
+STR R0, @14     # Constante 10
+LDI R0, $20
+STR R0, @15     # Constante 20
+LDI R0, $13
+STR R0, @16     # Constante 13
 
 SETUP:
 LDI R0, $0		#Carrega o acumulador com o valor 0
@@ -32,22 +37,22 @@ STR R0, @2		#" MEM[2] (centenas)
 STR R0, @3		#" MEM[3] (milhares)
 STR R0, @4		#" MEM[4] (dezenas de m.)
 STR R0, @5		#" MEM[5] (centenas de m.)
+LDI R0, $0      
 
 # INICIO LOOP PRINCIPAL ----------------------------------------- 
 LOOP:
 LDR R0, @352    # Verifica KEY0
 CEQi R0, $0     # 
-JEQ @33         # ....Se não foi pressionado, permanece no loop                     (JEQ) -->
-JSR @SEGUNDOS   # ....Se foi pressionado, entra na subrotina de incremento  
-LDR R0, @353    # Verifica KEY1                                                     <-- (JEQ)
+JEQ @39         # ....Se não foi pressionado, permanece no loop                     (A) -->
+JSR @SEGUNDOS   # ....Se foi pressionado, entra na subrotina de incremento
+LDR R0, @353    # Verifica KEY1                                                     <-- (A)
 CEQi R0, $0
-JEQ @37         # ....Se nao pressionado, permanece no loop                         (JEQ) -->
+JEQ @43         # ....Se nao pressionado, permanece no loop                         (B) -->
 JSR @MUDA_HORA  # ....Se foi, entao subrotina para mudar tipo de hora
-LDR R0, @356    # Verifica FPGA_RESET                                               <-- (JEQ)
-CEQi R0, $0
-JEQ @LOOP       # ....Se não foi pressionado, permanece no loop e volta para o inicio
+LDR R0, @356    # Verifica FPGA_RESET                                               <-- (B)
+CEQi R0, $0     
+JEQ @LOOP       # ....Se não foi pressionado, permanece no loop e volta para o inicio 
 JMP @RESET      # ....Se foi, entao reseta todos os valores e volta pro loop
-
 
 # ROTINA DE INCREMENTO ------------------------------------------
 SEGUNDOS:
@@ -55,7 +60,7 @@ STR R0, @511
 LDR R0, @0      # Carrega valor das unidades 
 ADDi R0, $1     # Soma com constante 1
 CEQi R0, $10     # Compara com a constante 10 para verificar o "vai 1"
-JEQ @DEZ_SEG    # Se for 10, pula para a casa das dezenas. Senão, atualiza o HEX0 com o próximo valor *************
+JEQ @DEZ_SEG    # Se for 10, pula para a casa das dezenas. Senão, atualiza o HEX0 com o próximo valor 
 STR R0, @0      # Armazena valor incrementado
 STR R0, @288    # Carrega HEX0 com novo valor   
 RET
@@ -66,8 +71,8 @@ STR R0, @0
 STR R0, @288    # Carrega HEX0 com 0
 LDR R0, @1
 ADDi R0, $1     # Soma com constante 1
-CEQi R0, $6     # Compara com a constante 10 para verificar o "vai 1"
-JEQ @MINUTOS    # Se for 10, pula para a casa das centenas. Senão, atualiza o HEX1 com o próximo valor *************
+CEQi R0, $1     # Compara com a constante 10 para verificar o "vai 1"
+JEQ @MINUTOS    # Se for 10, pula para a casa das centenas. Senão, atualiza o HEX1 com o próximo valor 
 STR R0, @1      # Armazena valor incrementado
 STR R0, @289    # Carrega HEX1 com novo valor  
 RET
@@ -79,7 +84,7 @@ STR R0, @289    # Carrega HEX1 com 0
 LDR R0, @2
 ADDi R0, $1     # Soma com constante 1
 CEQi R0, $10     # Compara com a constante 10 para verificar o "vai 1"
-JEQ @DEZ_MIN    # Se for 10, pula para a casa das unidades de milhares. Senão, atualiza o HEX2 com o próximo valor *************
+JEQ @DEZ_MIN    # Se for 10, pula para a casa das unidades de milhares. Senão, atualiza o HEX2 com o próximo valor 
 STR R0, @2      # Armazena valor incrementado
 STR R0, @290    # Carrega HEX2 com novo valor 
 RET
@@ -90,27 +95,25 @@ STR R0, @2
 STR R0, @290    # Carrega HEX2 com 0
 LDR R0, @3
 ADDi R0, $1     # Soma com constante 1
-CEQi R0, $6     # Compara com a constante 10 para verificar o "vai 1"
-JEQ @HORAS      # Se for 10, pula para a casa das dezenas de milhares. Senão, atualiza o HEX3 com o próximo valor *************
+CEQi R0, $1     # Compara com a constante 10 para verificar o "vai 1"
+JEQ @HORAS      # Se for 10, pula para a casa das dezenas de milhares. Senão, atualiza o HEX3 com o próximo valor 
 STR R0, @3      # Armazena valor incrementado
 STR R0, @291    # Carrega HEX3 com novo valor 
 RET
 
 HORAS:
+LDR R0, @9
+ADDi R0, $1     # SOMA_HORAS += 1
+STR R0, @9
+CEQ R0, @10     # SOMA_HORAS == Limite ?
+JEQ @RESET_2    # ....Reseta Contagem
 LDI R0, $0
 STR R0, @3      
 STR R0, @291    # Carrega HEX3 com 0
-LDR R0, @9
-ADDi R0, $1     # Adiciona 1 na soma das HORAS
-STR R0, @9
-CLT R0, @12     # Verifica se HORAS menor que 12
-JLT @89         # ....Se for, nao precisa indicar que maior q 12horas          (JLT) -->
-LDI R0, $1
-STR R0, @10     # Indicador para HORAS >= 12 horas
-LDR R0, @4      #                                                               <-- (JLT)
+LDR R0, @4
 ADDi R0, $1     # Soma com constante 1
-CEQi R0, $4     # Compara com a constante 10 para verificar o "vai 1"
-JEQ @DEZ_HORAS  # Se for 10, pula para a casa das centenas de milhares. Senão, atualiza o HEX4 com o próximo valor *************
+CEQi R0, $10    # Compara com a constante 10 para verificar o "vai 1"
+JEQ @DEZ_HORAS  # Se for 10, pula para a casa das centenas de milhares. Senão, atualiza o HEX4 com o próximo valor 
 STR R0, @4      # Armazena valor incrementado
 STR R0, @292    # Carrega HEX4 com novo valor 
 RET
@@ -121,87 +124,107 @@ STR R0, @4
 STR R0, @292    # Carrega HEX4 com 0
 LDR R0, @5
 ADDi R0, $1     # Soma com constante 1
-CEQ R0, @6      # Se DEZ_HORAS == Limite: 
-JEQ @RESET_2    # ....
 STR R0, @5      # Armazena valor incrementado
-STR R0, @293    # Carrega HEX5 com novo valor
+STR R0, @293    # Carrega HEX5 com novo valor 
 RET
 
 
 # ROTINA DE TROCA HORARIO ---------------------------------------
-MUDA_HORA: 
-LDR R0, @8          # R0 = Indicador se AM/PM
-CEQi R0, $0         # Se Indicador = 0:
-JEQ @PRE_AMPM_24H   # .... AM/PM ===> 24 horas
-#                   # .... 24 horas ===> AM/PM
-
-
-PRE_24H_AMPM:
-LDR R0, @10
-CEQi R0, $0    # SOMA_HORAS < 12?
-JEQ @24H_AMPM   # ....Se for pula
-LDR R0, @5
-SUBi R0, $1     # Disp_DEZ_HORA = Disp_DEZ_HORA - 1
-STR R0, @5
-LDR R0, @4
-SUBi R0, $2     # Disp_HORA = Disp_HORA - 2
-STR R0, @4
-# Nao precisa pular para 24H_AMPM, pq na ROM vai segui um do outro
-
-# VERIFICAR SOBRE O RESET PARA O AMPM
-
-24H_AMPM:
-LDI R0, $1
-STR R0, @6      # Seta o LIMITE de MEM[DezenasHoras] == 1
-STR R0, @8      # Modo: AM/PM
-LDI R0, $2
-STR R0, @7      # Seta o LIMITE de MEM[Horas] == 2
-RET
-
-
-PRE_AMPM_24H:
-LDR R0, @11
-CEQi R0, $0    # Ciclo AM?
-JEQ @24H_AMPM   # ....Se for pula
-LDR R0, @5
-ADDi R0, $1     # Disp_DEZ_HORA = Disp_DEZ_HORA + 1
-STR R0, @5
-LDR R0, @4
-ADDi R0, $2     # Disp_HORA = Disp_HORA + 2
-STR R0, @4
-
-# Nao precisa pular para AMPM_24H, pq na ROM vai segui um do outro
-
-AMPM_24H:
-LDI R0, $2
-STR R0, @6      # Seta o LIMITE de MEM[DezenasHoras] == 2
-LDI R0, $4
-STR R0, @7      # Seta o LIMITE de MEM[Horas] == 4
+MUDA_HORA:
+LDR R0, @8      # Verifica modo atual (0 = 24h, 1 = AM/PM)
+CEQi R0, $0     # Se era 24 HORAS:
+JEQ @SET_AMPM   # ....vai para definir AM/PM
 LDI R0, $0
-STR R0, @8      # Modo: 24 Horas
+STR R0, @8      # MODO: 24 Horas
+LDI R0, $24
+STR R0, @10     # limite = 24
+LDR R0, @9      # R0 = SOMA_HORAS
+CLT R0, @14     # SOMA_HORAS < 10 ?
+JLT @LESS10_24H
+LDR R0, @9
+CLT R0, @15     # SOMA_HORAS < 20 ?
+JLT @LESS20_24H
+LDI R0, $2
+STR R0, @5      # DEZ_HORAS = 2
+STR R0, @293    # HEX 5
+LDR R0, @9
+SUBi R0, $20
+STR R0, @4      # HORAS = SOMA_HORAS
+STR R0, @292    # HEX 4
+RET 
+
+LESS10_24H:
+LDI R0, $0
+STR R0, @5      # DEZ_HORAS = 0
+STR R0, @293    # HEX 5
+LDR R0, @9
+STR R0, @4      # HORAS = SOMA_HORAS
+STR R0, @292    # HEX 4
 RET
 
+LESS20_24H:
+LDI R0, $1
+STR R0, @5      # DEZ_HORAS = 1
+STR R0, @293    # HEX 5
+LDR R0, @9
+SUBi R0, $10
+STR R0, @4      # HORAS = SOMA_HORAS
+STR R0, @292    # HEX 4
+RET
+
+SET_AMPM:
+LDI R0, $1
+STR R0, @8      # Modo: AM/PM
+LDI R0, $12
+STR R0, @10     # limite <- 12
+LDR R0, @9      # R0 = hora absoluta
+CLT R0, @16     # se < 13 (1..12)
+JLT @AMPM_RET   # permanece sem ajuste
+LDI R0, $1
+STR R0, @17     # Ciclo: PM
+# (hora >= 13)  -->  subtrai 12 para exibir (1..11)
+LDR R0, @9
+SUBi R0, $12    # R0 = hora–12
+CLT R0, @14     # se < 10
+JLT @LESS10_AMPM
+# R0 >= 10 (só pode ser 10 ou 11)
+LDI R0, $1
+STR R0, @5      # DEZ_HORAS = 1
+STR R0, @293    # HEX5 <- 1
+LDR R0, @9
+SUBi R0, $22    # SOMA_HORAS_PM = SOMA_HORAS - 12 (PM) - 10
+STR R0, @4      # HORAS = SOMA_HORAS_PM - 10
+STR R0, @292    # HEX4 <- SOMA_HORAS_PM - 10
+RET
+
+LESS10_AMPM:
+LDI R0, $0      # DEZ_HORAS = 0
+STR R0, @5
+STR R0, @293    # HEX5 <- 0
+STR R0, @4      # HORAS = hora
+STR R0, @292    # HEX4 <- HORAS
+RET
+
+AMPM_RET:
+LDI R0, $0
+STR R0, @17     # Ciclo: AM
+RET
 
 # ROTINA DE RESET -----------------------------------------------
 RESET:
-#JMP @PRE_SETUP  # Se foi pressionado, entra na subrotina de reset
-LDI R0, $1
-STR R0, @4		#" MEM[4] (dezenas de m.)
-STR R0, @5		#" MEM[5] (centenas de m.)
-LDI R0, $11
-STR R0, @10
+JMP @PRE_SETUP  # Se foi pressionado, entra na subrotina de reset
 
-# RESET, porem sem deletar o PRE_SETUP (So limpa valores)
-# Utilizado qnd bater o limite do Relogio 12 ou 24 horas
 RESET_2:
-LDR R0, @11
-CEQi R0, $1     # Se Ciclo PM:
-JEQ @148        # ....                  (JEQ) -->
+LDR R0, @17     # Ciclo: AM ou PM
+CEQi R0, $1     # Se Ciclo == PM:
+JEQ @RESET_PM   # .... Zera soma, troca ciclo e faz setup
 LDI R0, $1
-STR R0, @11     # Ciclo AM => Ciclo PM
-JMP @SETUP      # Zera tudo
-LDI R0, $0      #                       <-- (JEQ) 
-STR R0, @9      # Zera SOMA_HORAS
+STR R0, @17     # ==> Ciclo: PM
+JMP @SETUP
+
+RESET_PM:
 LDI R0, $0
-STR R0, @11     # Ciclo PM => Ciclo AM
-JMP @SETUP      # Zera tudo
+STR R0, @17     # ==> Ciclo: AM
+LDI R0, $0
+STR R0, @9      # Soma das (APENAS) HORAS
+JMP @SETUP
