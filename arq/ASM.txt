@@ -132,15 +132,17 @@ RESET:
 JMP @SETUP      # Se foi pressionado, entra na subrotina de reset
 
 RESET_2:
-LDI R0, $0
-CLT @9, $1
+LDI R0, $1
+CLT R0, @9
 JLT @109
 STR R0, @9      # Contagem total
-CLT @4, $1
-JLT @112
+LDI R0, $1
+CLT R0, @4
+JLT @113
 STR R0, @4		#" MEM[4] (dezenas de m.)
-CLT @5, $1
-JLT @115
+LDI R0, $1
+CLT R0, @5
+JLT @117
 STR R0, @5		#" MEM[5] (centenas de m.)
 STR R0, @292	#" HEX4
 STR R0, @293	#" HEX5
