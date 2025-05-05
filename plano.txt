@@ -1,5 +1,5 @@
 Projeto 1: Relógio
-- Configuracao das horas: KEY3 aumenta as horas, KEY2 aumenta os minutos. } -> Meio conceito
+- Configuracao das horas: KEY3 aumenta as horas, KEY2 aumenta os minutos. } (FEITO) -> Meio conceito
 - Instruções novas:
     - ADDi: Adiciona Imediato (A = A + I)                            } (FEITO)
     - SUBi: Subtrai Imediato  (A = A - I)                            } (FEITO) -> Meio conceito
@@ -15,7 +15,7 @@ Nota: A+
 Nery:
     - Base tempo
     - SW8 Velocidade média e SW9 velocidade rápida
-    - Botoes para configuracao das horas (KEY2)
+    - Botoes para configuracao dos minutos (KEY2)
     - CLT e SUBi
     - Adaptação para a arquitetura registrador-memória
     - Montador assembler

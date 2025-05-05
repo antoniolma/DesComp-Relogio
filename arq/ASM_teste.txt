@@ -30,12 +30,16 @@ LDR R0, @352    # Verifica KEY0
 CEQi R0, $0     # 
 JEQ @27         # ....Se não foi pressionado, permanece no loop                     (A) -->
 JSR @SEGUNDOS   # ....Se foi pressionado, entra na subrotina de incremento
-LDR R0, @355    # Verifica KEY3                                                     <-- (A)
-CEQi R0, $0
-JEQ @31         # ....Se não foi pressionado, permanece no loop                     (B) -->
+LDR R1, @354    # Verifica KEY2                                                     <-- (A)
+CEQi R1, $0
+JEQ @31         # ....Se não foi pressionado, permanece no loop                     (C) -->
+JSR @MINUTOS    # ....Se foi pressionado, entra na subrotina de incremento dos minutos
+LDR R2, @355    # Verifica KEY3                                                     <-- (C) 
+CEQi R2, $0
+JEQ @35         # ....Se não foi pressionado, permanece no loop                     (B) -->
 JSR @HORAS      # ....Se foi pressionado, entra na subrotina de incremento das horas
-LDR R0, @356    # Verifica FPGA_RESET                                               <-- (B)
-CEQi R0, $0     
+LDR R3, @356    # Verifica FPGA_RESET                                               <-- (B)
+CEQi R3, $0     
 JEQ @LOOP       # ....Se não foi pressionado, permanece no loop e volta para o inicio 
 JMP @RESET      # ....Se foi, entao reseta todos os valores e volta pro loop
 
@@ -57,63 +61,69 @@ STR R0, @0
 STR R0, @288    # Carrega HEX0 com 0
 LDR R0, @1
 ADDi R0, $1     # Soma com constante 1
-CEQi R0, $1     # Compara com a constante 10 para verificar o "vai 1"
-JEQ @MINUTOS    # Se for 10, pula para a casa das centenas. Senão, atualiza o HEX1 com o próximo valor 
+CEQi R0, $6     # Compara com a constante 6 para verificar o "vai 1"
+JEQ @PRE_MINUTOS# Se for 10, pula para a casa das centenas. Senão, atualiza o HEX1 com o próximo valor 
 STR R0, @1      # Armazena valor incrementado
 STR R0, @289    # Carrega HEX1 com novo valor  
 RET
 
+PRE_MINUTOS:
+LDR R1, @1
+SUBi R1, $5
+STR R1, @1
+STR R1, @289    # Carrega HEX1 com 0
+
 MINUTOS:
-LDI R0, $0
-STR R0, @1
-STR R0, @289    # Carrega HEX1 com 0
-LDR R0, @2
-ADDi R0, $1     # Soma com constante 1
-CEQi R0, $10     # Compara com a constante 10 para verificar o "vai 1"
+STR R1, @509
+LDR R1, @2
+ADDi R1, $1     # Soma com constante 1
+CEQi R1, $10    # Compara com a constante 10 para verificar o "vai 1"
 JEQ @DEZ_MIN    # Se for 10, pula para a casa das unidades de milhares. Senão, atualiza o HEX2 com o próximo valor 
-STR R0, @2      # Armazena valor incrementado
-STR R0, @290    # Carrega HEX2 com novo valor 
+STR R1, @2      # Armazena valor incrementado
+STR R1, @290    # Carrega HEX2 com novo valor 
 RET
 
 DEZ_MIN:
-LDI R0, $0
-STR R0, @2      
-STR R0, @290    # Carrega HEX2 com 0
-LDR R0, @3
-ADDi R0, $1     # Soma com constante 1
-CEQi R0, $1     # Compara com a constante 10 para verificar o "vai 1"
-JEQ @PRE_HORAS      # Se for 10, pula para a casa das dezenas de milhares. Senão, atualiza o HEX3 com o próximo valor 
-STR R0, @3      # Armazena valor incrementado
-STR R0, @291    # Carrega HEX3 com novo valor 
+LDI R1, $0
+STR R1, @2      
+STR R1, @290    # Carrega HEX2 com 0
+LDR R1, @3
+ADDi R1, $1     # Soma com constante 1
+CEQi R1, $6     # Compara com a constante 6 para verificar o "vai 1"
+JEQ @PRE_HORAS  # Se for 10, pula para a casa das dezenas de milhares. Senão, atualiza o HEX3 com o próximo valor 
+STR R1, @3      # Armazena valor incrementado
+STR R1, @291    # Carrega HEX3 com novo valor 
 RET
 
 PRE_HORAS:
-LDI R0, $0
-STR R0, @3
-STR R0, @291    # Carrega HEX3 com 0
+LDR R2, @3
+SUBi R2, $5
+STR R2, @3
+STR R2, @291    # Carrega HEX3 com 0
 
 HORAS:
-LDR R0, @9
-ADDi R0, $1     # SOMA_HORAS += 1
-STR R0, @9
-CEQ R0, @10     # SOMA_HORAS == Limite ?
+STR R2, @508
+LDR R2, @9
+ADDi R2, $1     # SOMA_HORAS += 1
+STR R2, @9
+CEQ R2, @10     # SOMA_HORAS == Limite ?
 JEQ @RESET_2    # ....Reseta Contagem
-LDR R0, @4
-ADDi R0, $1     # Soma com constante 1
-CEQi R0, $10    # Compara com a constante 10 para verificar o "vai 1"
+LDR R2, @4
+ADDi R2, $1     # Soma com constante 1
+CEQi R2, $10    # Compara com a constante 10 para verificar o "vai 1"
 JEQ @DEZ_HORAS  # Se for 10, pula para a casa das centenas de milhares. Senão, atualiza o HEX4 com o próximo valor 
-STR R0, @4      # Armazena valor incrementado
-STR R0, @292    # Carrega HEX4 com novo valor 
+STR R2, @4      # Armazena valor incrementado
+STR R2, @292    # Carrega HEX4 com novo valor 
 RET
 
 DEZ_HORAS:
-LDI R0, $0
-STR R0, @4
-STR R0, @292    # Carrega HEX4 com 0
-LDR R0, @5
-ADDi R0, $1     # Soma com constante 1
-STR R0, @5      # Armazena valor incrementado
-STR R0, @293    # Carrega HEX5 com novo valor 
+LDI R2, $0
+STR R2, @4
+STR R2, @292    # Carrega HEX4 com 0
+LDR R2, @5
+ADDi R2, $1     # Soma com constante 1
+STR R2, @5      # Armazena valor incrementado
+STR R2, @293    # Carrega HEX5 com novo valor 
 RET
 
 
