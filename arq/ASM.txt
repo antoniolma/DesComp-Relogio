@@ -1,4 +1,5 @@
 SETUP:
+LDI R7, $1      # R7 = 1 (constante 1)
 LDI R0, $0		#Carrega o acumulador com o valor 0
 STR R0, @511	#" Leitura KEY0
 STR R0, @510	#" Leitura KEY1
@@ -13,30 +14,43 @@ STR R0, @293	#" HEX5
 STR R0, @256	#" LDR0 ~ LDR7
 STR R0, @257	#" LDR8
 STR R0, @258	#" LDR9
+CLT R7, @0      # M[0] < 1?
+JLT @18
 STR R0, @0		#" MEM[0] (unidades)
+CLT R7, @1      # M[1] < 1?
+JLT @21
 STR R0, @1		#" MEM[1] (dezenas)
+CLT R7, @2      # M[2] < 1?
+JLT @24
 STR R0, @2		#" MEM[2] (centenas)
+CLT R7, @3      # M[3] < 1?
+JLT @27
 STR R0, @3		#" MEM[3] (milhares)
+CLT R7, @4      # M[4] < 1?
+JLT @30
 STR R0, @4		#" MEM[4] (dezenas de m.)
+CLT R7, @5      # M[5] < 1?
+JLT @33
 STR R0, @5		#" MEM[5] (centenas de m.)
+CLT R7, @9      # M[9] < 1?
+JLT @36
 STR R0, @9      # Contagem total
 LDI R0, $24
 STR R0, @10     # Limite horas
-LDI R7, $1      # R7 = 1
 
 # INICIO LOOP PRINCIPAL ----------------------------------------- 
 LOOP:
 LDR R0, @352    # Verifica KEY0
 CEQi R0, $0     # 
-JEQ @28         # ....Se não foi pressionado, permanece no loop                     (A) -->
+JEQ 42         # ....Se não foi pressionado, permanece no loop                     (A) -->
 JSR @SEGUNDOS   # ....Se foi pressionado, entra na subrotina de incremento
 LDR R1, @354    # Verifica KEY2                                                     <-- (A)
 CEQi R1, $0
-JEQ @32         # ....Se não foi pressionado, permanece no loop                     (C) -->
+JEQ @46         # ....Se não foi pressionado, permanece no loop                     (C) -->
 JSR @MINUTOS    # ....Se foi pressionado, entra na subrotina de incremento dos minutos
 LDR R2, @355    # Verifica KEY3                                                     <-- (C) 
 CEQi R2, $0
-JEQ @36         # ....Se não foi pressionado, permanece no loop                     (B) -->
+JEQ @50         # ....Se não foi pressionado, permanece no loop                     (B) -->
 JSR @HORAS      # ....Se foi pressionado, entra na subrotina de incremento das horas
 LDR R3, @356    # Verifica FPGA_RESET                                               <-- (B)
 CEQi R3, $0     
@@ -133,14 +147,8 @@ JMP @SETUP      # Se foi pressionado, entra na subrotina de reset
 
 RESET_2:
 LDI R0, $0
-CLT R7, @9      # M[9] < 1?
-JLT @110
 STR R0, @9      # ZERA Contagem total
-CLT R7, @4
-JLT @113
 STR R0, @4		# ZERA MEM[4] (dezenas de m.)
-CLT R7, @5
-JLT @116
 STR R0, @5		# ZERA MEM[5] (centenas de m.)
 STR R0, @292	# ZERA HEX4
 STR R0, @293	# ZERA HEX5
