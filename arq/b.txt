@@ -10,7 +10,7 @@ LDI R0, $4
 STR R0, @7      # LIMITE de MEM[DezHoras] == 4
 LDI R0, $12
 STR R0, @12     # Constante 12
-LDI R0, $24
+LDI R0, $23
 STR R0, @10     # Limite horas
 
 SETUP:
@@ -32,30 +32,33 @@ STR R0, @2		#" MEM[2] (centenas)
 STR R0, @3		#" MEM[3] (milhares)
 STR R0, @4		#" MEM[4] (dezenas de m.)
 STR R0, @5		#" MEM[5] (centenas de m.)
-LDI R0, $0      
+STR R0, @11     # Ciclo: AM ou PM (0 ou 1)
+STR R0, @22     # TMP: auxiliar para ATUALIZA_DISP
+
 
 # INICIO LOOP PRINCIPAL ----------------------------------------- 
 LOOP:
 LDR R0, @352    # Verifica KEY0
 CEQi R0, $0     # 
-JEQ @999         # ....Se não foi pressionado, permanece no loop                     (A) -->
+JEQ @35         # ....Se não foi pressionado, permanece no loop                     (A) -->
 JSR @SEGUNDOS   # ....Se foi pressionado, entra na subrotina de incremento
 LDR R0, @353    # Verifica KEY1                                                     <-- (A)
 CEQi R0, $0
-JEQ @999         # ....Se nao pressionado, permanece no loop                         (B) -->
+JEQ @39         # ....Se nao pressionado, permanece no loop                         (B) -->
 JSR @MUDA_HORA  # ....Se foi, entao subrotina para mudar tipo de hora
 LDR R0, @356    # Verifica FPGA_RESET                                               <-- (B)
 CEQi R0, $0     
 JEQ @LOOP       # ....Se não foi pressionado, permanece no loop e volta para o inicio 
 JMP @RESET      # ....Se foi, entao reseta todos os valores e volta pro loop
 
+
 # ROTINA DE INCREMENTO ------------------------------------------
 SEGUNDOS:
 STR R0, @511
 LDR R0, @0      # Carrega valor das unidades 
 ADDi R0, $1     # Soma com constante 1
-CEQi R0, $10     # Compara com a constante 10 para verificar o "vai 1"
-JEQ @DEZ_SEG    # Se for 10, pula para a casa das dezenas. Senão, atualiza o HEX0 com o próximo valor 
+CEQi R0, $10    # Compara com a constante 10 para verificar o "vai 1"
+JEQ @DEZ_SEG      # SEG == 10?  
 STR R0, @0      # Armazena valor incrementado
 STR R0, @288    # Carrega HEX0 com novo valor   
 RET
@@ -67,9 +70,9 @@ STR R0, @288    # Carrega HEX0 com 0
 LDR R0, @1
 ADDi R0, $1     # Soma com constante 1
 CEQi R0, $1     # Compara com a constante 10 para verificar o "vai 1"
-JEQ @MINUTOS    # Se for 10, pula para a casa das centenas. Senão, atualiza o HEX1 com o próximo valor 
+JEQ @MINUTOS    # DEZ_SEG == 6? 
 STR R0, @1      # Armazena valor incrementado
-STR R0, @289    # Carrega HEX1 com novo valor  
+STR R0, @289    # Carrega HEX1 com novo valor 
 RET
 
 MINUTOS:
@@ -78,8 +81,8 @@ STR R0, @1
 STR R0, @289    # Carrega HEX1 com 0
 LDR R0, @2
 ADDi R0, $1     # Soma com constante 1
-CEQi R0, $10     # Compara com a constante 10 para verificar o "vai 1"
-JEQ @DEZ_MIN    # Se for 10, pula para a casa das unidades de milhares. Senão, atualiza o HEX2 com o próximo valor 
+CEQi R0, $10    # Compara com a constante 10 para verificar o "vai 1"
+JEQ @DEZ_MIN    # MIN == 10? 
 STR R0, @2      # Armazena valor incrementado
 STR R0, @290    # Carrega HEX2 com novo valor 
 RET
@@ -91,7 +94,7 @@ STR R0, @290    # Carrega HEX2 com 0
 LDR R0, @3
 ADDi R0, $1     # Soma com constante 1
 CEQi R0, $1     # Compara com a constante 10 para verificar o "vai 1"
-JEQ @HORAS      # Se for 10, pula para a casa das dezenas de milhares. Senão, atualiza o HEX3 com o próximo valor 
+JEQ @HORAS      # DEZ_MIN == 6? 
 STR R0, @3      # Armazena valor incrementado
 STR R0, @291    # Carrega HEX3 com novo valor 
 RET
@@ -100,10 +103,10 @@ HORAS:
 LDR R0, @9
 ADDi R0, $1     # SOMA_HORAS += 1
 STR R0, @9
-CEQ R0, @10     # SOMA_HORAS == Limite ?
-JEQ @RESET_2    # ....Reseta Contagem
+CEQ R0, @10     # Se SOMA_HORAS == Limite: 
+JEQ @RESET_2    # ....Reseta tudo
 LDI R0, $0
-STR R0, @3      
+STR R0, @3
 STR R0, @291    # Carrega HEX3 com 0
 LDR R0, @4
 ADDi R0, $1     # Soma com constante 1
@@ -120,37 +123,126 @@ STR R0, @292    # Carrega HEX4 com 0
 LDR R0, @5
 ADDi R0, $1     # Soma com constante 1
 STR R0, @5      # Armazena valor incrementado
-STR R0, @293    # Carrega HEX5 com novo valor 
+STR R0, @293    # Carrega HEX5 com novo valor
 RET
-
 
 # ROTINA DE TROCA HORARIO ---------------------------------------
 
 MUDA_HORA:
-    LDR R0, @8         # carrega modo atual (0=24h,1=AM/PM)
-    CEQi R0, $0
-    JEQ @SET_AMPM      # se era 0, vai setar AM/PM
+LDR R0, @8          # R0 = Indicador de Modo
+CEQi R0, $0         # Se Modo = 24 horas:
+JEQ @PRE_24H_AMPM   # .... 24 horas ===> AM/PM
+#                   # .... AM/PM ===> 24 horas
 
-    # caso seja 1 (AM/PM), volta para 24h
-    LDI R0, $0
-    STR R0, @8         # modo = 0 (24h)
-    LDI R0, $24
-    STR R0, @10        # limite = 24
-    RET
 
-SET_AMPM:
-    LDI R0, $1
-    STR R0, @8         # modo = 1 (AM/PM)
-    LDI R0, $12
-    STR R0, @10        # limite = 12
-    RET
+# MUDA DE MODO: AM/PM ===> 24 HORAS
+PRE_AMPM_24H:
+LDR R0, @9
+CLT R0, @12     # Se SOMA_HORAS < 12
+JLT @AMPM_24H   # .... Ignora ajuste
+LDR R0, @9
+ADDi R0, $12    # SOMA_HORAS += 12
+STR R0, @9
+
+# Criei essas labels para facilitar saber onde acontece cada coisa
+ATUALIZA_DISP_1:
+LDR R0, @9
+STR R0, @22     # Auxiliar para atualizar displays (M[22] = SOMA_HORAS)
+LDI R0, $0
+STR R0, @4      # ZERA horas
+STR R0, @5      # ZERA dezenas_horas
+
+LOOP_DISP_1:
+LDR R0, @22
+CLT R0, $10     # SOMA_HORAS < 10 ?
+JLT @END_LOOP_DISP_1
+SUBi R0, $10    #
+STR R0, @22     # SOMA_HORAS -= 10
+LDR R0, @5
+ADDi R0, $1     # DEZ_HORAS += 1
+STR R0, @5
+JMP @LOOP_DISP_1
+
+END_LOOP_DISP_1:
+LDR R0, @22
+STR R0, @4      # HORAS = Resto de SOMA_HORAS
+STR R0, @292    # HEX 4 = Resto de SOMA_HORAS
+LDR R0, @5
+STR R0, @293    # HEX 5 = DEZ_HORAS
+
+AMPM_24H:
+LDI R0, $0
+STR R0, @8      # Modo: 24 Horas
+LDI R0, $2
+STR R0, @6      # LIMITE de MEM[DezenasHoras] == 2
+LDI R0, $4
+STR R0, @7      # LIMITE de MEM[DezHoras] == 4
+LDI R0, $23
+STR R0, @10     # Limite horas
+RET
+
+
+# MUDA DE MODO: 24 HORAS ===> AM/PM
+PRE_24H_AMPM:
+LDR R0, @9
+CLT R0, @12     # Se SOMA_HORAS < 12
+JLT @24H_AMPM   # .... Ignora ajuste
+LDR R0, @9
+SUBi R0, $12    # SOMA_HORAS -= 12
+STR R0, @9
+
+# Criei essas labels para facilitar saber onde acontece cada coisa
+ATUALIZA_DISP_2:
+LDR R0, @9
+STR R0, @22     # Auxiliar para atualizar displays (M[22] = SOMA_HORAS)
+LDI R0, $0
+STR R0, @4      # ZERA horas
+STR R0, @5      # ZERA dezenas_horas
+
+LOOP_DISP_2:
+LDR R0, @22
+CLT R0, $10     # SOMA_HORAS < 10 ?
+JLT @END_LOOP_DISP_2
+SUBi R0, $10    #
+STR R0, @22     # SOMA_HORAS -= 10
+LDR R0, @5
+ADDi R0, $1     # DEZ_HORAS += 1
+STR R0, @5
+JMP @LOOP_DISP_2
+
+END_LOOP_DISP_2:
+LDR R0, @22
+STR R0, @4      # HORAS = Resto de SOMA_HORAS
+STR R0, @292    # HEX 4 = Resto de SOMA_HORAS
+LDR R0, @5
+STR R0, @293    # HEX 5 = DEZ_HORAS
+
+24H_AMPM:
+LDI R0, $1
+STR R0, @8      # Modo: AM/PM
+STR R0, @6      # LIMITE de MEM[DezenasHoras] == 1
+LDI R0, $2
+STR R0, @7      # LIMITE de MEM[DezHoras] == 2
+LDI R0, $11
+STR R0, @10     # Limite horas
+RET
 
 
 # ROTINA DE RESET -----------------------------------------------
 RESET:
 JMP @PRE_SETUP  # Se foi pressionado, entra na subrotina de reset
 
+# RESET, porem sem deletar o PRE_SETUP (So limpa valores)
+# Utilizado qnd bater o limite do Relogio 12 ou 24 horas
 RESET_2:
+LDR R0, @11
+CEQi R0, $1     # Se Ciclo PM:
+JEQ @178        #                       (C) -->
+LDI R0, $1
+STR R0, @11     # Ciclo AM => Ciclo PM
+JMP @SETUP      # Zera tudo
+LDI R0, $0      #                       <-- (C) 
+STR R0, @9      # Zera SOMA_HORAS
 LDI R0, $0
-STR R0, @9      # Soma das (APENAS) HORAS
-JMP @SETUP
+STR R0, @11     # Ciclo PM => Ciclo AM
+JMP @SETUP      # Zera tudo
