@@ -55,7 +55,7 @@ def encode_operand(token, label_map):
     low = val-256 if val>255 else val
     return msb, format(low,'02X')
 
-def assemble_instruction(mnemonic: str, operands: str, label_map):
+def assemble_instruction(mnemonic: str, operands: str, label_map: str):
     # 1) opcode 5 bits
     code = int(mne[mnemonic], 16)
     op5 = format(code, '05b')
